@@ -25,14 +25,14 @@ const sites = [
   {
     name              : 'ft.com',
     baseQuery         : 'https://www.ft.com/search?q=',
-    regExForCount     : /Viewing results? \d+‒\d+ of (\d+)/, // Viewing results 1‒25 of 2578
-    regExForNoResults : /No results found/,
+    regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
+    regExForNoResults : 'No results found',
   },
   {
     name              : 'www.nytimes.com',
     baseQuery         : 'https://www.nytimes.com/search?query=',
-    regExForCount     : /Showing ([\d,]+) results? for:/, // Showing 493,595 results for:
-    regExForNoResults : /Showing 0 results for:/,
+    regExForCount     : 'Showing ([\\d,]+) results? for:', // Showing 493,595 results for:
+    regExForNoResults : 'Showing 0 results for:',
   }
 
 ];
@@ -85,6 +85,8 @@ function primeAllSites( sites, phrases ){
 
 function searchForSitesPhrase( site, phraseObj ){
   const query = phraseObj.query;
+  const regExForCount = new RegExp( site.regExForCount );
+  const regExForNoResults = new RegExp( site.regExForNoResults );
 
   return fetch( query )
   .then( res => {
@@ -94,11 +96,11 @@ function searchForSitesPhrase( site, phraseObj ){
   .then( res => res.text() )
   .then( text => {
     let result = FAILED_SEARCH;
-    const mCount = text.match( site.regExForCount );
+    const mCount = text.match( regExForCount );
     if (mCount !== null) {
       result = mCount[1].replace(/,/g, "");
     } else {
-      const mNoResults = text.match( site.regExForNoResults );
+      const mNoResults = text.match( regExForNoResults );
       if (mNoResults !== null) {
         result = '0';
       }
@@ -134,10 +136,15 @@ function searchSites( sites ){
   return Promise.all( promises )
   .then( sitesResults => {
     console.log( `sitesResults: ${JSON.stringify(sitesResults, null, 2)}`);
+    return sites;
   })
   .catch(error => {
     console.log(error.message)
   });
+}
+
+function formatStats( sites ){
+
 }
 
 const phrases = generatePhrases();
