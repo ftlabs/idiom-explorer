@@ -81,6 +81,7 @@ function primeAllSites( sites, phrases ){
    sites.map( site => {
      generateSiteQueriesForAllPhrases( site, phrases );
    });
+   return sites;
 }
 
 function searchForSitesPhrase( site, phraseObj ){
@@ -135,7 +136,7 @@ function searchSites( sites ){
 
   return Promise.all( promises )
   .then( sitesResults => {
-    console.log( `sitesResults: ${JSON.stringify(sitesResults, null, 2)}`);
+    // console.log( `sitesResults: ${JSON.stringify(sitesResults, null, 2)}`);
     return sites;
   })
   .catch(error => {
@@ -144,9 +145,34 @@ function searchSites( sites ){
 }
 
 function formatStats( sites ){
+  const phraseCountsPerSite = [];
+  const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
 
+  // set column names
+  const columnNamesRow = ['phrases'];
+  sites.map( site => { columnNamesRow.push(site.name); });
+  phraseCountsPerSite.push( columnNamesRow );
+
+  // fill in copunts per phrase per site
+  phrases.map( phrase => {
+    const row = [ phrase ];
+    sites.map( site => { row.push(site.byPhrase[phrase].result); });
+    phraseCountsPerSite.push( row );
+  });
+
+  return {
+    sites,
+    phraseCountsPerSite
+  };
 }
 
 const phrases = generatePhrases();
 primeAllSites( sites, phrases );
-searchSites( sites );
+searchSites( sites )
+.then( sites => {
+  const formattedResults = formatStats( sites );
+  console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
+})
+.catch( error => {
+  console.log(error.message);
+});
