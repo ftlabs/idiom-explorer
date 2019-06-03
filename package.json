@@ -1,0 +1,33 @@
+{
+  "name": "idioms",
+  "version": "1.0.0",
+  "description": "looks for idioms in various sites",
+  "main": "scanForIdioms.js",
+  "scripts": {
+    "start": "node scanForIdioms.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ftlabs/...git"
+  },
+  "keywords": [
+    "ftlabs"
+  ],
+  "author": "Chris Gathercole",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ftlabs/.../issues"
+  },
+  "homepage": "https://github.com/ftlabs/...#readme",
+  "dependencies": {
+    "debug": "^2.3.3",
+    "dotenv": "^2.0.0",
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.2",
+    "node-fetch": "^1.6.3"
+  },
+  "engines": {
+    "node": "8.9.x"
+  }
+}
