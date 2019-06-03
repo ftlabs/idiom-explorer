@@ -1,9 +1,16 @@
 // scan assorted news sites for idioms
 
+const directly = require('./bin/lib/directly'); // trying Rhys' https://github.com/wheresrhys/directly.
+                                                // You pass 'directly' a list of fns, each of which generates a promise.
+                                                // The fn calls are throttled.
+
+const SITE_FETCH_CONCURRENCE  = (process.env.hasOwnProperty('SITE_FETCH_CONCURRENCE' ))? process.env.SITE_FETCH_CONCURRENCE  : 2;
+const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MILLIS'))? process.env.SITE_FETCH_DELAY_MILLIS : 300;
+
 const fetch = require('node-fetch');
 
 const pluralNumbers   = [ 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
-const singularNumbers = [ 'a', 'one' ];
+const singularNumbers = [ 'a', 'an', 'one' ];
 const pluralAmounts   = [ 'many', 'some', 'a few', 'dozens of', 'half a dozen', 'more than half a dozen' ];
 
 const idiomsWithPlurals = [
@@ -16,6 +23,31 @@ const idiomsWithPlurals = [
     basePhrase   : 'according to',
     singularNoun : 'source',
     pluralNoun   : 'sources',
+  },
+  {
+    basePhrase   : 'according to',
+    singularNoun : 'official',
+    pluralNoun   : 'officials',
+  },
+  {
+    basePhrase   : 'according to',
+    singularNoun : 'economist',
+    pluralNoun   : 'economists',
+  },
+  {
+    basePhrase   : 'according to',
+    singularNoun : 'expert',
+    pluralNoun   : 'experts',
+  },
+  {
+    basePhrase   : 'according to',
+    singularNoun : 'poll',
+    pluralNoun   : 'polls',
+  },
+  {
+    basePhrase   : 'according to',
+    singularNoun : 'analyst',
+    pluralNoun   : 'analysts',
   },
 ];
 
@@ -33,7 +65,13 @@ const sites = [
     baseQuery         : 'https://www.nytimes.com/search?query=',
     regExForCount     : 'Showing ([\\d,]+) results? for:', // Showing 493,595 results for:
     regExForNoResults : 'Showing 0 results for:',
-  }
+  },
+  // {
+  //   name              : 'www.telegraph.co.uk',
+  //   baseQuery         : 'https://www.telegraph.co.uk/search.html?q=',
+  //   regExForCount     : 'About ([\\d,]+) results', // About 5,460,000 results
+  //   regExForNoResults : 'No Results',
+  // },
 
 ];
 
@@ -89,9 +127,11 @@ function searchForSitesPhrase( site, phraseObj ){
   const regExForCount = new RegExp( site.regExForCount );
   const regExForNoResults = new RegExp( site.regExForNoResults );
 
+  const startMillis = Date.now();
   return fetch( query )
   .then( res => {
     phraseObj.status = res.status;
+    phraseObj.durationMillis = Date.now() - startMillis;
     return res;
   })
   .then( res => res.text() )
@@ -114,14 +154,25 @@ function searchForSitesPhrase( site, phraseObj ){
 }
 
 function searchSite( site ){
+  site.SITE_FETCH_CONCURRENCE = SITE_FETCH_CONCURRENCE;
+  site.SITE_FETCH_DELAY_MILLIS = SITE_FETCH_DELAY_MILLIS;
   const phrases = Object.keys( site.byPhrase );
-  const promises = phrases.map( phrase => {
+  // create array of funcs which return search promises, to pass to directly() to throttle the searches
+  const promisers = phrases.map( phrase => {
     const phraseObj = site.byPhrase[phrase];
-    return searchForSitesPhrase( site, phraseObj );
+    return function() {
+      return searchForSitesPhrase( site, phraseObj )
+        .catch( err => {
+          console.log( `ERROR: getAllEntityFacets: promise for entity=${entity}, err=${err}`);
+        return;
+      });
+    };
   });
 
-  return Promise.all( promises )
+  const startMillis = Date.now();
+  return directly( SITE_FETCH_CONCURRENCE, promisers, SITE_FETCH_DELAY_MILLIS )
   .then( results => {
+    site.searchDurationMillis = Date.now() - startMillis;
     return {
       site,
       results
@@ -166,11 +217,13 @@ function formatStats( sites ){
   };
 }
 
+const startMillis = Date.now();
 const phrases = generatePhrases();
 primeAllSites( sites, phrases );
 searchSites( sites )
 .then( sites => {
   const formattedResults = formatStats( sites );
+  formattedResults.durationMillis = Date.now() - startMillis;
   console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
 })
 .catch( error => {
