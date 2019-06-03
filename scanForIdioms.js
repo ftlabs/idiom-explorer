@@ -149,7 +149,7 @@ function formatStats( sites ){
   const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
 
   // set column names
-  const columnNamesRow = ['phrases'];
+  const columnNamesRow = ['phrase'];
   sites.map( site => { columnNamesRow.push(site.name); });
   phraseCountsPerSite.push( columnNamesRow );
 
@@ -162,7 +162,7 @@ function formatStats( sites ){
 
   return {
     sites,
-    phraseCountsPerSite
+    phraseCountsPerSiteCsv : phraseCountsPerSite.map( row => { return row.join(','); } ),
   };
 }
 
