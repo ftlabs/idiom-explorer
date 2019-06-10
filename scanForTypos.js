@@ -14,7 +14,9 @@ const typos = [
   'the there',
   'the their',
   'a the',
+  'an the',
   'the a',
+  'the an',
   'a an',
   'their their',
   'with with',
@@ -56,14 +58,15 @@ const sites = [
     regExForNoResults : 'No results found',
     regExForEachResult : [
       'class=\"search-item\"',
-      'class=\"o-teaser__tag\"[^>]+>([^<]+)<',
+      'class=\"o-teaser__tag\"[^>]+>([^<]+)<', // section
       'class=\"o-teaser__heading\"',
-      '<a href=\"([^\"]+)\"[^>]+>([^<]+)<',
+      '<a href=\"([^\"]+)\"[^>]+>([^<]+)<', // path, heading
       'class=\"o-teaser__standfirst\"',
-      '<a.*?<span>(',
+      '<a.*?<span>(', // standfirst
       ')</span></a>',
-      'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<',
+      'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
     ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
+
   },
   // {
   //   name              : 'www.nytimes.com',
@@ -215,8 +218,9 @@ function formatStats( sites ){
 }
 
 const startMillis = Date.now();
+const phrases = typos;
 // const phrases = typos.concat(standardCandles);
-const phrases = standardCandles;
+// const phrases = standardCandles;
 
 primeAllSites( sites, phrases );
 searchSites( sites )
