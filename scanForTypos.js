@@ -18,6 +18,7 @@ const typos = [
   'the a',
   'the an',
   'a an',
+  'a a',
   'their their',
   'with with',
 ];
