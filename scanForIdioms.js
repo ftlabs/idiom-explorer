@@ -5,20 +5,23 @@ const directly = require('./bin/lib/directly'); // trying Rhys' https://github.c
                                                 // The fn calls are throttled.
 
 const SITE_FETCH_CONCURRENCE  = (process.env.hasOwnProperty('SITE_FETCH_CONCURRENCE' ))? process.env.SITE_FETCH_CONCURRENCE  : 2;
-const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MILLIS'))? process.env.SITE_FETCH_DELAY_MILLIS : 300;
+const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MILLIS'))? process.env.SITE_FETCH_DELAY_MILLIS : 500;
 
 const fetch = require('node-fetch');
 
-const pluralNumbers   = [ 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const singularNumbers = [ 'a', 'an', 'one' ];
+// const singularNumbers = [ 'a', 'one' ];
+const pluralNumbers   = [ 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const pluralAmounts   = [ 'many', 'some', 'a few', 'dozens of', 'half a dozen', 'more than half a dozen' ];
+// const pluralNumbers   = [ 'two', 'three', ];
+// const pluralAmounts   = [ 'many', 'some', ];
 
 const idiomsWithPlurals = [
-  {
-    basePhrase   : 'according to',
-    singularNoun : 'person',
-    pluralNoun   : 'people',
-  },
+  // {
+  //   basePhrase   : 'according to',
+  //   singularNoun : 'person',
+  //   pluralNoun   : 'people',
+  // },
   {
     basePhrase   : 'according to',
     singularNoun : 'source',
@@ -130,6 +133,7 @@ function searchForSitesPhrase( site, phraseObj ){
   const startMillis = Date.now();
   return fetch( query )
   .then( res => {
+    console.log( `fetch: query: (${res.status}) ${query}` );
     phraseObj.status = res.status;
     phraseObj.durationMillis = Date.now() - startMillis;
     return res;
@@ -217,6 +221,85 @@ function formatStats( sites ){
   };
 }
 
+function formatStatsGrouped( sites ){
+  const phraseCountsPerSiteGrouped = [];
+  const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
+
+  // construct useful map to identify phraseTemplates from phrase
+  const phraseTemplateLookup = {}; // final word of phrase -> template
+  const templatePhrases = [];
+  idiomsWithPlurals.map( iwp => {
+      const templatePhrase = `${iwp.basePhrase} X ${iwp.pluralNoun}`;
+      templatePhrases.push(templatePhrase);
+      phraseTemplateLookup[iwp.singularNoun] = templatePhrase;
+      phraseTemplateLookup[iwp.pluralNoun] = templatePhrase;
+  });
+
+  const templatePhraseStandardCandle = 'standard candle';
+  // templatePhrases.push(templatePhraseStandardCandle);
+  standardCandles.map( sc => {
+    phraseTemplateLookup[sc] = templatePhraseStandardCandle;
+  });
+
+  // set column names
+  const columnNamesRow = ['phrase amount'];
+  templatePhrases.map( templatePhrase => {
+    sites.map( site => {
+      const siteTemplateName = `${templatePhrase} - ${site.name}`;
+      columnNamesRow.push(siteTemplateName);
+    });
+  });
+
+  phraseCountsPerSiteGrouped.push( columnNamesRow );
+
+  const countsByAmountsBySiteByTemplate = {};
+  phrases.map( phrase => {
+    const phraseWords = phrase.split(' ');
+    const finalPhraseWord = phraseWords.pop();
+    const templatePhrase = phraseTemplateLookup[finalPhraseWord];
+    if (templatePhrase == templatePhraseStandardCandle) {
+      return;
+    }
+    let amount = phraseWords.slice(2).join(' ');
+    if (amount == 'an' || amount == 'a') {
+      amount = 'a/an';
+    }
+
+    if (! countsByAmountsBySiteByTemplate.hasOwnProperty( amount )) {
+      countsByAmountsBySiteByTemplate[amount] = {};
+    }
+
+    sites.map( site => {
+      if (! countsByAmountsBySiteByTemplate[amount].hasOwnProperty(site.name)) {
+        countsByAmountsBySiteByTemplate[amount][site.name] = {};
+      }
+      if (amount == 'a/an'
+      && site.byPhrase[phrase].result < countsByAmountsBySiteByTemplate[amount][site.name][templatePhrase]) {
+        // skip;
+      } else {
+        countsByAmountsBySiteByTemplate[amount][site.name][templatePhrase] = site.byPhrase[phrase].result;
+      }
+    });
+  });
+
+  Object.keys( countsByAmountsBySiteByTemplate ).map( amount => {
+    const row = [ amount ];
+    Object.keys( countsByAmountsBySiteByTemplate[amount] ).map( siteName => {
+      Object.keys( countsByAmountsBySiteByTemplate[amount][siteName] ).map( templatePhrase => {
+        const count = countsByAmountsBySiteByTemplate[amount][siteName][templatePhrase];
+        row.push( count );
+      });
+    });
+    phraseCountsPerSiteGrouped.push( row );
+  });
+
+  return {
+    // sites,
+    countsByAmountsBySiteByTemplate,
+    phraseCountsPerSiteGroupedCsv : phraseCountsPerSiteGrouped.map( row => { return row.join(','); } ),
+  };
+}
+
 const startMillis = Date.now();
 const phrases = generatePhrases();
 primeAllSites( sites, phrases );
@@ -225,6 +308,13 @@ searchSites( sites )
   const formattedResults = formatStats( sites );
   formattedResults.durationMillis = Date.now() - startMillis;
   console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
+  return sites;
+})
+.then( sites => {
+  const formattedResults = formatStatsGrouped( sites );
+  formattedResults.durationMillis = Date.now() - startMillis;
+  console.log( `formatStatsGrouped: ${JSON.stringify(formattedResults, null, 2)}`);
+  return sites;
 })
 .catch( error => {
   console.log(error.message);
