@@ -12,16 +12,21 @@ const fetch = require('node-fetch');
 const typos = [
   'the the',
   'the there',
-  // 'the their',
-  // 'a the',
-  // 'an the',
-  // 'the a',
-  // 'the an',
-  // 'a an',
-  // 'a a',
-  // 'their their',
-  // 'with with',
+  'the their',
+  'a the',
+  'an the',
+  'the an',
+  'a an',
+  'their their',
+  'with with',
+  'the a',
+  'a a',
 ];
+
+const notTypos = {
+  'the a' : '>A<\\/mark>(\\$|\\d+| [lL]evel)',
+  'a a'   : '(&amp;<mark|>A<\\/mark>\\$)'
+}
 
 const standardCandles = [
   'trump',
@@ -108,10 +113,12 @@ function primeAllSites( sites, phrases ){
 }
 
 function searchForSitePhrase( site, phraseObj ){
+  const phrase = phraseObj.phrase;
   const query = phraseObj.query;
   const regExForCount      = new RegExp( site.regExForCount      );
   const regExForNoResults  = new RegExp( site.regExForNoResults  );
   const regExForEachResult = new RegExp( site.regExForEachResult, ['g']);
+  const regExForNotTypo    = notTypos.hasOwnProperty(phrase)? new RegExp(notTypos[phrase]) : null;
 
   const startMillis = Date.now();
   return fetch( query )
@@ -132,14 +139,20 @@ function searchForSitePhrase( site, phraseObj ){
       // look up each result
       let resultMatches;
       while ((resultMatches = regExForEachResult.exec(text)) !== null) {
-        // console.log( `resultMatches: ${JSON.stringify(resultMatches, null, 2)}`);
-        phraseObj.results.push({
-          section    : resultMatches[1],
-          path       : resultMatches[2],
-          heading    : resultMatches[3],
-          standfirst : resultMatches[4],
-          date       : resultMatches[5],
-        });
+        const standfirst = resultMatches[4];
+
+        if (regExForNotTypo !== null
+          && standfirst.match(regExForNotTypo) !== null) {
+          // skip this result
+        } else {
+          phraseObj.results.push({
+            section    : resultMatches[1],
+            path       : resultMatches[2],
+            heading    : resultMatches[3],
+            standfirst,
+            date       : resultMatches[5],
+          });
+        }
       }
     } else {
       const mNoResults = text.match( regExForNoResults );
@@ -188,7 +201,6 @@ function searchSites( sites ){
 
   return Promise.all( promises )
   .then( sitesResults => {
-    // console.log( `sitesResults: ${JSON.stringify(sitesResults, null, 2)}`);
     return sites;
   })
   .catch(error => {

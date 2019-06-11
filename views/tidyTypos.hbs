@@ -1,5 +1,16 @@
 <h1>Typos</h1>
 
 {{#each sites as |site|}}
-<h2>{{ site.name }}</h2>
+  <h2>{{ site.name }}</h2>
+  {{#each site.byPhrase as |phraseObj phrase|}}
+    <p>
+      <a href="{{ phraseObj.query}}">{{ phrase }}</a> (status {{phraseObj.status}}, results {{phraseObj.result}})
+    </p>
+    <ul>
+      {{#each phraseObj.results as |result|}}
+        <li>({{result.section}}, {{result.date}}) {{result.heading}} (<a href="https://www.ft.com{{result.path}}">https://www.ft.com{{result.path}}</a>)</li>
+        <p>{{{result.standfirst}}}</p>
+      {{/each}}
+    </ul>
+  {{/each}}
 {{/each}}
