@@ -9,23 +9,19 @@ const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MI
 
 const fetch = require('node-fetch');
 
-const typos = [
-  'a a',
-  'a an',
-  'a the',
-  'an an',
-  'an the',
-  'and and',
-  'said said',
-  'the a',
-  'the an',
-  'the the',
-  'the their',
-  'the there',
-  'their their',
-  'were were',
-  'with with',
-];
+let typos = [ 'the the' ];
+
+if (process.env.hasOwnProperty('PHRASES' )) {
+  try {
+    const phrases = JSON.parse( process.env.PHRASES )
+    typos = phrases;
+  }
+  catch( err ){
+    console.log( `WARNING: parsing PHRASES: err=${err}. Defaulting to ${JSON.stringify(typos)}`);
+  }
+} else {
+  console.log( `WARNING: PHRASES not specified in env. Defaulting to ${JSON.stringify(typos)}`);
+}
 
 const notTypos = {
   'the a' : '>A<\\/mark>(\\$|\\d+| [lL]evel)',
