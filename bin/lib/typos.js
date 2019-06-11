@@ -1,6 +1,6 @@
 // scan assorted news sites for idioms
 
-const directly = require('./bin/lib/directly'); // trying Rhys' https://github.com/wheresrhys/directly.
+const directly = require('./directly'); // trying Rhys' https://github.com/wheresrhys/directly.
                                                 // You pass 'directly' a list of fns, each of which generates a promise.
                                                 // The fn calls are throttled.
 
@@ -218,19 +218,29 @@ function formatStats( sites ){
   };
 }
 
-const startMillis = Date.now();
-const phrases = typos;
-// const phrases = typos.concat(standardCandles);
-// const phrases = standardCandles;
+function scanRaw() {
+  const startMillis = Date.now();
+  const phrases = typos;
+  // const phrases = typos.concat(standardCandles);
+  // const phrases = standardCandles;
 
-primeAllSites( sites, phrases );
-searchSites( sites )
-.then( sites => {
-  const formattedResults = formatStats( sites );
-  formattedResults.durationMillis = Date.now() - startMillis;
-  console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
-  return sites;
-})
-.catch( error => {
-  console.log(error.message);
-});
+  primeAllSites( sites, phrases );
+
+  return searchSites( sites )
+  .then( sites => {
+    const formattedResults = formatStats( sites );
+    formattedResults.durationMillis = Date.now() - startMillis;
+    console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
+    return sites;
+  })
+  .catch( error => {
+    console.log(error.message);
+  });
+}
+
+
+
+module.exports = {
+        scanRaw,
+        phrases : typos,
+};

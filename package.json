@@ -21,10 +21,12 @@
   },
   "homepage": "https://github.com/ftlabs/...#readme",
   "dependencies": {
+    "@financial-times/s3o-middleware": "^2.0.4",
     "debug": "^2.3.3",
     "dotenv": "^2.0.0",
     "express": "^4.16.4",
     "express-handlebars": "^3.0.2",
+    "hbs": "^4.0.1",
     "node-fetch": "^1.6.3"
   },
   "engines": {
