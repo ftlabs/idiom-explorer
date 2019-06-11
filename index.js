@@ -39,8 +39,8 @@ if (process.env.BYPASS_TOKEN !== "true") {
 
 app.use("/typos/raw", (req, res) => {
   typos.scanRaw()
-  .then( data => {
-    res.json(data);
+  .then( sites => {
+    res.json(sites);
   })
   .catch( err => {
     console.log( `ERROR: path=/typos/json, err=${err}`);
@@ -51,6 +51,18 @@ app.use("/typos/raw", (req, res) => {
 
 app.use("/typos/phrases", (req, res) => {
   res.json(typos.phrases);
+});
+
+app.use("/typos/tidy", (req, res) => {
+  typos.scanRaw()
+  .then( sites => {
+    res.render('tidyTypos', { sites });
+  })
+  .catch( err => {
+    console.log( `ERROR: path=/typos/json, err=${err}`);
+    res.json( { err } );;
+  })
+  ;
 });
 
 

@@ -12,15 +12,15 @@ const fetch = require('node-fetch');
 const typos = [
   'the the',
   'the there',
-  'the their',
-  'a the',
-  'an the',
-  'the a',
-  'the an',
-  'a an',
-  'a a',
-  'their their',
-  'with with',
+  // 'the their',
+  // 'a the',
+  // 'an the',
+  // 'the a',
+  // 'the an',
+  // 'a an',
+  // 'a a',
+  // 'their their',
+  // 'with with',
 ];
 
 const standardCandles = [
@@ -237,8 +237,6 @@ function scanRaw() {
     console.log(error.message);
   });
 }
-
-
 
 module.exports = {
         scanRaw,
