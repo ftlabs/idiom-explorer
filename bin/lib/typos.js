@@ -10,17 +10,21 @@ const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MI
 const fetch = require('node-fetch');
 
 const typos = [
-  'the the',
-  'the there',
-  'the their',
-  'a the',
-  'an the',
-  'the an',
-  'a an',
-  'their their',
-  'with with',
-  'the a',
   'a a',
+  'a an',
+  'a the',
+  'an an',
+  'an the',
+  'and and',
+  'said said',
+  'the a',
+  'the an',
+  'the the',
+  'the their',
+  'the there',
+  'their their',
+  'were were',
+  'with with',
 ];
 
 const notTypos = {
