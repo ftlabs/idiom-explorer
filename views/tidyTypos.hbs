@@ -10,6 +10,7 @@
       {{#each phraseObj.results as |result|}}
         <li>({{result.section}}, {{result.date}}) {{result.heading}} (<a href="https://www.ft.com{{result.path}}">https://www.ft.com{{result.path}}</a>)</li>
         <p>{{{result.standfirst}}}</p>
+        <p>--&gt; "{{phrase}}"</p>
       {{/each}}
     </ul>
   {{/each}}
