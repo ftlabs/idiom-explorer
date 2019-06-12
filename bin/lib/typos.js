@@ -24,8 +24,9 @@ if (process.env.hasOwnProperty('PHRASES' )) {
 }
 
 const notTypos = {
+  'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
+  'a the' : '-<mark[^>]+>A<',
   'the a' : '>A<\\/mark>(\\$|\\d+| [lL]evel)',
-  'a a'   : '(&amp;<mark|>A<\\/mark>\\$)'
 }
 
 const standardCandles = [
