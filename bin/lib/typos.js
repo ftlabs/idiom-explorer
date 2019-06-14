@@ -26,7 +26,7 @@ if (process.env.hasOwnProperty('PHRASES' )) {
 const notTypos = {
   'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
   'a the' : '(-<mark[^>]+>[aA]<|>[aA]<\\/mark>\\))',
-  'the a' : '>A<\\/mark>(\\$|\\d+| [lL]evel)',
+  'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
 }
 
 const standardCandles = [
