@@ -72,6 +72,20 @@ const standardCandles = [
   'business',
 ];
 
+let maxDays = 7;
+if (process.env.hasOwnProperty('MAXDAYS' )) {
+  const numDays = parseInt( process.env.MAXDAYS );
+  if (numDays > 0) {
+    maxDays = numDays;
+    console.log( `INFO: MAXDAYS specified in env: ${maxDays}`);
+  } else {
+    console.log( `WARNING: MAXDAYS specified in env, but failed to parse as a +ve int: defaulting to ${maxDays}`);
+  }
+} else  {
+  console.log( `INFO: MAXDAYS not specified in env: defaulting to ${maxDays}`);
+}
+
+
 // <div class="search-item">
 //  <div class="search-item__teaser">
 //   <div class="o-teaser o-teaser--article o-teaser--small o-teaser--has-image js-teaser" data-id="21281750-87e6-11e9-a028-86cea8523dc2">
@@ -98,7 +112,7 @@ const standardCandles = [
 const sites = [
   {
     name              : 'ft.com',
-    baseQuery         : 'https://www.ft.com/search?dateRange=now-7d&q=',
+    baseQuery         : `https://www.ft.com/search?dateRange=now-${maxDays}d&q=`,
     regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
     regExForNoResults : 'No results found',
     regExForEachResult : [
