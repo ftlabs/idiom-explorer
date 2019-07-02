@@ -9,12 +9,13 @@ const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MI
 
 const fetch = require('node-fetch');
 
-let typos = [ 'the the' ];
+let typos = [ 'the the' ]; // default
 
 if (process.env.hasOwnProperty('PHRASES' )) {
   try {
     const phrases = JSON.parse( process.env.PHRASES )
     typos = phrases;
+    console.log( `INFO: PHRASES specified in env: ${JSON.stringify(typos)}`);
   }
   catch( err ){
     console.log( `WARNING: parsing PHRASES: err=${err}. Defaulting to ${JSON.stringify(typos)}`);
@@ -30,8 +31,8 @@ if (process.env.hasOwnProperty('PHRASES' )) {
 // }
 
 // for clarity, break out the regex for a phrase into a list of individual fragments,
-// each of which is a not typo, then concat them into one regex for each phrase.
-const notTyposFragments = {
+// each of which is a not typo, then concat them with pipes into one regex for each phrase.
+let notTyposFragments = { // default
   'a a'   : [
     '&amp;<mark',
     '>A<\\/mark>\\$'
@@ -44,6 +45,19 @@ const notTyposFragments = {
     '>A<\\/mark>',
     '“<mark[^>]+>a<\\/mark>”' // NB the details of the speech marks
   ],
+}
+
+if (process.env.hasOwnProperty('NOTTYPOSFRAGMENTS' )) {
+  try {
+    const parsed = JSON.parse( process.env.NOTTYPOSFRAGMENTS );
+    notTyposFragments = parsed;
+    console.log( `INFO: NOTTYPOSFRAGMENTS specified in env: ${JSON.stringify(notTyposFragments)}`);
+  }
+  catch( err ){
+    console.log( `WARNING: parsing NOTTYPOSFRAGMENTS: err=${err}. Defaulting to ${JSON.stringify(notTyposFragments)}`);
+  }
+} else {
+  console.log( `WARNING: NOTTYPOSFRAGMENTS not specified in env. Defaulting to ${JSON.stringify(notTyposFragments)}`);
 }
 
 // construct regex pattern from fragment list for each notTypo phrase
