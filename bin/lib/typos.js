@@ -23,11 +23,35 @@ if (process.env.hasOwnProperty('PHRASES' )) {
   console.log( `WARNING: PHRASES not specified in env. Defaulting to ${JSON.stringify(typos)}`);
 }
 
-const notTypos = {
-  'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
-  'a the' : '(-<mark[^>]+>[aA]<|>[aA]<\\/mark>\\))',
-  'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
+// const notTypos = {
+//   'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
+//   'a the' : '(-<mark[^>]+>[aA]<|>[aA]<\\/mark>\\))',
+//   'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
+// }
+
+// for clarity, break out the regex for a phrase into a list of individual fragments,
+// each of which is a not typo, then concat them into one regex for each phrase.
+const notTyposFragments = {
+  'a a'   : [
+    '&amp;<mark',
+    '>A<\\/mark>\\$'
+  ],
+  'a the' : [
+    '-<mark[^>]+>[aA]<',
+    '>[aA]<\\/mark>\\)'
+  ],
+  'the a' : [
+    '>A<\\/mark>',
+    '“<mark[^>]+>a<\\/mark>”' // NB the details of the speech marks
+  ],
 }
+
+// construct regex pattern from fragment list for each notTypo phrase
+const notTypos = {};
+Object.keys(notTyposFragments).map( phrase => {
+  const fragments = notTyposFragments[phrase];
+  notTypos[phrase] = fragments.join('|');
+});
 
 const standardCandles = [
   'trump',
