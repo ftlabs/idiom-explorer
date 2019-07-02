@@ -117,6 +117,7 @@ const sites = [
   {
     name              : 'ft.com',
     baseQuery         : `https://www.ft.com/search?dateRange=now-${maxDays}d&q=`,
+    maxDays,
     regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
     regExForNoResults : 'No results found',
     regExForEachResult : [
