@@ -39,7 +39,11 @@ let notTyposFragments = { // default
   ],
   'a the' : [
     '-<mark[^>]+>[aA]<',
-    '>[aA]<\\/mark>\\)'
+    '>[aA]<\\/mark>\\)',
+    '&amp;<mark[^>]+>A<'
+  ],
+  'an the' : [
+    'Ping <mark[^>]+>An<'
   ],
   'the a' : [
     '>A<\\/mark>',
