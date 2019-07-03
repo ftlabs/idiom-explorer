@@ -203,9 +203,13 @@ function searchForSitePhrase( site, phraseObj ){
           && standfirst.match(regExForNotTypo) !== null) {
           // skip this result
         } else {
+          const path = resultMatches[2];
+          const fullPath = path.startsWith('/') ? `https://www.ft.com${path}` : path;
+
           phraseObj.results.push({
             section    : resultMatches[1],
-            path       : resultMatches[2],
+            path,
+            fullPath,
             heading    : resultMatches[3],
             standfirst,
             date       : resultMatches[5],
