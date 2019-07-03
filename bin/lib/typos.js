@@ -309,6 +309,12 @@ function scanRaw() {
 }
 
 module.exports = {
-        scanRaw,
-        phrases : typos,
+  scanRaw,
+  config : {
+    typos,
+    notTypos,
+    notTyposFragments,
+    maxDays,
+    sites,
+  }
 };
