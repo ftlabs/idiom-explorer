@@ -4,7 +4,7 @@
   <h2>{{ site.name }}, over past {{site.maxDays}} days</h2>
   {{#each site.byPhrase as |phraseObj phrase|}}
     <p>
-      <a href="{{ phraseObj.query}}">{{ phrase }}</a> (status {{phraseObj.status}}, results {{phraseObj.result}})
+      <a href="{{ phraseObj.query}}">{{ phrase }}</a> (status {{phraseObj.status}}, results {{phraseObj.result}}{{#if site.alignApp}}, <a href="{{site.alignApp}}{{phrase}}">align</a>{{/if}})
     </p>
     <ul>
       {{#each phraseObj.results as |result|}}
@@ -14,4 +14,9 @@
       {{/each}}
     </ul>
   {{/each}}
+
+  {{#if site.alignApp}}
+  <h3>NB</h3>
+    <p>The <a href="{{site.alignApp}}">align</a> links refer to an experimental app which looks at all the most recent results, not just those in the last {{site.maxDays}} days.</p>
+  {{/if}}
 {{/each}}

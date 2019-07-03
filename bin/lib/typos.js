@@ -130,7 +130,7 @@ const sites = [
       ')</span></a>',
       'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
     ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
-
+    alignApp          : 'http://ftlabs-alignment.herokuapp.com/align?text=', 
   },
   // {
   //   name              : 'www.nytimes.com',
