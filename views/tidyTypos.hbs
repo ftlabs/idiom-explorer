@@ -1,14 +1,14 @@
-<h1>Typos for past 7 days</h1>
+<h1>Typos for assorted sites</h1>
 
 {{#each sites as |site|}}
-  <h2>{{ site.name }}</h2>
+  <h2>{{ site.name }}, over past {{site.maxDays}} days</h2>
   {{#each site.byPhrase as |phraseObj phrase|}}
     <p>
       <a href="{{ phraseObj.query}}">{{ phrase }}</a> (status {{phraseObj.status}}, results {{phraseObj.result}})
     </p>
     <ul>
       {{#each phraseObj.results as |result|}}
-        <li>({{result.section}}, {{result.date}}) {{result.heading}} (<a href="https://www.ft.com{{result.path}}">https://www.ft.com{{result.path}}</a>)</li>
+        <li>({{result.section}}, {{result.date}}) {{result.heading}} (<a href="{{result.fullPath}}">{{result.fullPath}}</a>)</li>
         <p>{{{result.standfirst}}}</p>
         <p>--&gt; "{{phrase}}"</p>
       {{/each}}

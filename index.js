@@ -49,8 +49,8 @@ app.use("/typos/raw", (req, res) => {
   ;
 });
 
-app.use("/typos/phrases", (req, res) => {
-  res.json(typos.phrases);
+app.use("/typos/config", (req, res) => {
+  res.json(typos.config);
 });
 
 app.use("/typos/tidy", (req, res) => {
@@ -64,7 +64,6 @@ app.use("/typos/tidy", (req, res) => {
   })
   ;
 });
-
 
 // ---
 

@@ -9,12 +9,13 @@ const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MI
 
 const fetch = require('node-fetch');
 
-let typos = [ 'the the' ];
+let typos = [ 'the the' ]; // default
 
 if (process.env.hasOwnProperty('PHRASES' )) {
   try {
     const phrases = JSON.parse( process.env.PHRASES )
     typos = phrases;
+    console.log( `INFO: PHRASES specified in env: ${JSON.stringify(typos)}`);
   }
   catch( err ){
     console.log( `WARNING: parsing PHRASES: err=${err}. Defaulting to ${JSON.stringify(typos)}`);
@@ -23,16 +24,71 @@ if (process.env.hasOwnProperty('PHRASES' )) {
   console.log( `WARNING: PHRASES not specified in env. Defaulting to ${JSON.stringify(typos)}`);
 }
 
-const notTypos = {
-  'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
-  'a the' : '(-<mark[^>]+>[aA]<|>[aA]<\\/mark>\\))',
-  'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
+// const notTypos = {
+//   'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
+//   'a the' : '(-<mark[^>]+>[aA]<|>[aA]<\\/mark>\\))',
+//   'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
+// }
+
+// for clarity, break out the regex for a phrase into a list of individual fragments,
+// each of which is a not typo, then concat them with pipes into one regex for each phrase.
+let notTyposFragments = { // default
+  'a a'   : [
+    '&amp;<mark',
+    '>A<\\/mark>\\$'
+  ],
+  'a the' : [
+    '-<mark[^>]+>[aA]<',
+    '>[aA]<\\/mark>\\)',
+    '&amp;<mark[^>]+>A<'
+  ],
+  'an the' : [
+    'Ping <mark[^>]+>An<'
+  ],
+  'the a' : [
+    '>A<\\/mark>',
+    '“<mark[^>]+>a<\\/mark>”' // NB the details of the speech marks
+  ],
 }
+
+if (process.env.hasOwnProperty('NOTTYPOSFRAGMENTS' )) {
+  try {
+    const parsed = JSON.parse( process.env.NOTTYPOSFRAGMENTS );
+    notTyposFragments = parsed;
+    console.log( `INFO: NOTTYPOSFRAGMENTS specified in env: ${JSON.stringify(notTyposFragments)}`);
+  }
+  catch( err ){
+    console.log( `WARNING: parsing NOTTYPOSFRAGMENTS: err=${err}. Defaulting to ${JSON.stringify(notTyposFragments)}`);
+  }
+} else {
+  console.log( `WARNING: NOTTYPOSFRAGMENTS not specified in env. Defaulting to ${JSON.stringify(notTyposFragments)}`);
+}
+
+// construct regex pattern from fragment list for each notTypo phrase
+const notTypos = {};
+Object.keys(notTyposFragments).map( phrase => {
+  const fragments = notTyposFragments[phrase];
+  notTypos[phrase] = fragments.join('|');
+});
 
 const standardCandles = [
   'trump',
   'business',
 ];
+
+let maxDays = 7;
+if (process.env.hasOwnProperty('MAXDAYS' )) {
+  const numDays = parseInt( process.env.MAXDAYS );
+  if (numDays > 0) {
+    maxDays = numDays;
+    console.log( `INFO: MAXDAYS specified in env: ${maxDays}`);
+  } else {
+    console.log( `WARNING: MAXDAYS specified in env, but failed to parse as a +ve int: defaulting to ${maxDays}`);
+  }
+} else  {
+  console.log( `INFO: MAXDAYS not specified in env: defaulting to ${maxDays}`);
+}
+
 
 // <div class="search-item">
 //  <div class="search-item__teaser">
@@ -60,7 +116,8 @@ const standardCandles = [
 const sites = [
   {
     name              : 'ft.com',
-    baseQuery         : 'https://www.ft.com/search?dateRange=now-7d&q=',
+    baseQuery         : `https://www.ft.com/search?dateRange=now-${maxDays}d&q=`,
+    maxDays,
     regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
     regExForNoResults : 'No results found',
     regExForEachResult : [
@@ -146,9 +203,13 @@ function searchForSitePhrase( site, phraseObj ){
           && standfirst.match(regExForNotTypo) !== null) {
           // skip this result
         } else {
+          const path = resultMatches[2];
+          const fullPath = path.startsWith('/') ? `https://www.ft.com${path}` : path;
+
           phraseObj.results.push({
             section    : resultMatches[1],
-            path       : resultMatches[2],
+            path,
+            fullPath,
             heading    : resultMatches[3],
             standfirst,
             date       : resultMatches[5],
@@ -252,6 +313,12 @@ function scanRaw() {
 }
 
 module.exports = {
-        scanRaw,
-        phrases : typos,
+  scanRaw,
+  config : {
+    typos,
+    notTypos,
+    notTyposFragments,
+    maxDays,
+    sites,
+  }
 };
