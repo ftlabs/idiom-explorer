@@ -186,8 +186,6 @@ function parseSites( sites ){
 }
 
 function scanRaw() {
-  const startMillis = Date.now();
-
   return scanForPhrases.raw( sites )
   .then( sitesPlusFormat => {
     const sites = sitesPlusFormat.sites;
