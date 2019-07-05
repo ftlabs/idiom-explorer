@@ -1,4 +1,4 @@
-// scan assorted news sites for idioms
+// scan assorted news sites for typos
 
 const scanForPhrases = require("./scanForPhrases");
 
