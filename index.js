@@ -9,6 +9,7 @@ const app = express();
 const validateRequest = require("./helpers/check-token");
 
 const typos = require("./bin/lib/typos");
+const scanForPhrases = require("./bin/lib/scanForPhrases");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -43,7 +44,7 @@ app.use("/typos/raw", (req, res) => {
     res.json(sites);
   })
   .catch( err => {
-    console.log( `ERROR: path=/typos/json, err=${err}`);
+    console.log( `ERROR: path=/typos/raw, err=${err}`);
     res.json( { err } );;
   })
   ;
@@ -61,6 +62,41 @@ app.use("/typos/tidy", (req, res) => {
   .catch( err => {
     console.log( `ERROR: path=/typos/json, err=${err}`);
     res.json( { err } );;
+  })
+  ;
+});
+
+app.use("/scanForPhrases/raw", (req, res) => {
+  const maxDays = 100;
+  const sites = [
+    {
+      name              : 'ft.com',
+      baseQuery         : `https://www.ft.com/search?dateRange=now-${maxDays}d&q=`,
+      maxDays,
+      regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
+      regExForNoResults : 'No results found',
+      regExForEachResult : [
+        'class=\"search-item\"',
+        'class=\"o-teaser__tag\"[^>]+>([^<]+)<', // section
+        'class=\"o-teaser__heading\"',
+        '<a href=\"([^\"]+)\"[^>]+>([^<]+)<', // path, heading
+        'class=\"o-teaser__standfirst\"',
+        '<a.*?<span>(', // standfirst
+        ')</span></a>',
+        'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
+      ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
+      alignApp          : 'http://ftlabs-alignment.herokuapp.com/align?text=',
+      phrases : [ 'the the' ],
+    },
+  ];
+
+  scanForPhrases.raw(sites)
+  .then( sites => {
+    res.json(sites);
+  })
+  .catch( err => {
+    console.log( `ERROR: path=/scanForPhrases/raw, err=${err}`);
+    res.json( { err } );
   })
   ;
 });
