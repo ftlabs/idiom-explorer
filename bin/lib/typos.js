@@ -1,8 +1,5 @@
 // scan assorted news sites for idioms
 
-const directly = require('./directly'); // trying Rhys' https://github.com/wheresrhys/directly.
-                                                // You pass 'directly' a list of fns, each of which generates a promise.
-                                                // The fn calls are throttled.
 const scanForPhrases = require("./scanForPhrases");
 
 let typos = [ 'the the' ]; // default
