@@ -153,7 +153,7 @@ function raw(sites) {
   .then( sites => {
     const formattedResults = formatStats( sites );
     formattedResults.durationMillis = Date.now() - startMillis;
-    console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
+    // console.log( `formattedResults: ${JSON.stringify(formattedResults, null, 2)}`);
     return {
       sites,
       formattedResults,
