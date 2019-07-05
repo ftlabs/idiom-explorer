@@ -87,6 +87,7 @@ app.use("/scanForPhrases/raw", (req, res) => {
       ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
       alignApp          : 'http://ftlabs-alignment.herokuapp.com/align?text=',
       phrases : [ 'the the' ],
+      generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`; },
     },
   ];
 

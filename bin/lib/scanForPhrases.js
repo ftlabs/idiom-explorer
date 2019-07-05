@@ -11,16 +11,12 @@ const fetch = require('node-fetch');
 
 const FAILED_SEARCH = '-1'; // to differentiate from actually finding a result of 0
 
-function generateSiteQuery( site, phrase ){
-  return `${site.baseQuery}"${phrase}"`;
-}
-
 function generateSiteQueriesForAllPhrases( site ){
   site.byPhrase = {};
   site.phrases.map( phrase => {
     site.byPhrase[phrase] = {
       phrase,
-      query : generateSiteQuery( site, phrase ),
+      query : site.generateSiteQuery( site, phrase ),
     };
   });
 }
@@ -49,7 +45,6 @@ function searchForSitePhrase( site, phraseObj ){
   .then( res => res.text() )
   .then( text => {
     phraseObj.resultText = text;
-    phraseObj.results = [];
     let result = FAILED_SEARCH;
     const mCount = text.match( regExForCount );
     if (mCount !== null) {
