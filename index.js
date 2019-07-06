@@ -9,6 +9,8 @@ const app = express();
 const validateRequest = require("./helpers/check-token");
 
 const typos = require("./bin/lib/typos");
+const scanForPhrases = require("./bin/lib/scanForPhrases");
+const idioms = require("./bin/lib/idioms");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -43,7 +45,7 @@ app.use("/typos/raw", (req, res) => {
     res.json(sites);
   })
   .catch( err => {
-    console.log( `ERROR: path=/typos/json, err=${err}`);
+    console.log( `ERROR: path=/typos/raw, err=${err}`);
     res.json( { err } );;
   })
   ;
@@ -60,6 +62,61 @@ app.use("/typos/tidy", (req, res) => {
   })
   .catch( err => {
     console.log( `ERROR: path=/typos/json, err=${err}`);
+    res.json( { err } );;
+  })
+  ;
+});
+
+app.use("/idioms/config", (req, res) => {
+  res.json(idioms.config);
+});
+
+function parseIdiomsSpec( specText = '' ){
+  // AXN -> adverb number noun
+  // SC -> standard candle
+  // /idioms/raw?spec=AXN:according to,source,sources|according to,person,people|SC:finance
+
+  const spec = {
+    'AXN' : [],
+    'SC'  : []
+  }
+
+  if (specText) {
+
+    specText.split('|')
+    .map( item => {
+      const itemParts = item.split(':');
+      if (itemParts.length !== 2) {
+        throw new Error(`parseIdiomsSpec: could not parse item=${item}`);
+      }
+      if (itemParts[0] == 'AXN') {
+        const axnParts = itemParts[1].split(',');
+        if (axnParts.length !== 3) {
+          throw new Error(`parseIdiomsSpec: could not parse itemParts[1]=${itemParts[1]}`);
+        }
+
+        spec.AXN.push({
+          basePhrase   : axnParts[0],
+          singularNoun : axnParts[1],
+          pluralNoun   : axnParts[2],
+        });
+      } else if (itemParts[0] == 'SC') {
+        spec.SC.push( itemParts[1] );
+      }
+    });
+  }
+  return spec;
+}
+
+app.use("/idioms/raw", (req, res) => {
+  const spec = parseIdiomsSpec( req.query.spec );
+  console.log(`INFO: /idioms/raw: spec=${JSON.stringify(spec)}`);
+  idioms.scanRaw(spec)
+  .then( sites => {
+    res.json(sites);
+  })
+  .catch( err => {
+    console.log( `ERROR: path=/idioms/raw, err=${err}`);
     res.json( { err } );;
   })
   ;
