@@ -71,8 +71,47 @@ app.use("/idioms/config", (req, res) => {
   res.json(idioms.config);
 });
 
+function parseIdiomsSpec( specText = '' ){
+  // AXN -> adverb number noun
+  // SC -> standard candle
+  // /idioms/raw?spec=AXN:according to,source,sources|according to,person,people|SC:finance
+
+  const spec = {
+    'AXN' : [],
+    'SC'  : []
+  }
+
+  if (specText) {
+
+    specText.split('|')
+    .map( item => {
+      const itemParts = item.split(':');
+      if (itemParts.length !== 2) {
+        throw new Error(`parseIdiomsSpec: could not parse item=${item}`);
+      }
+      if (itemParts[0] == 'AXN') {
+        const axnParts = itemParts[1].split(',');
+        if (axnParts.length !== 3) {
+          throw new Error(`parseIdiomsSpec: could not parse itemParts[1]=${itemParts[1]}`);
+        }
+
+        spec.AXN.push({
+          basePhrase   : axnParts[0],
+          singularNoun : axnParts[1],
+          pluralNoun   : axnParts[2],
+        });
+      } else if (itemParts[0] == 'SC') {
+        spec.SC.push( itemParts[1] );
+      }
+    });
+  }
+  return spec;
+}
+
 app.use("/idioms/raw", (req, res) => {
-  idioms.scanRaw()
+  const spec = parseIdiomsSpec( req.query.spec );
+  console.log(`INFO: /idioms/raw: spec=${JSON.stringify(spec)}`);
+  idioms.scanRaw(spec)
   .then( sites => {
     res.json(sites);
   })

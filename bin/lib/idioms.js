@@ -49,36 +49,18 @@ const idiomsWithPlurals = [
 
 const standardCandles = [ 'the', 'finance', 'abc', 'news', 'political', ];
 
-const sites = [
-  {
-    name              : 'ft.com',
-    baseQuery         : 'https://www.ft.com/search?q=',
-    regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
-    regExForNoResults : 'No results found',
-    generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`;},
-  },
-  {
-    name              : 'www.nytimes.com',
-    baseQuery         : 'https://www.nytimes.com/search?query=',
-    regExForCount     : 'Showing ([\\d,]+) results? for:', // Showing 493,595 results for:
-    regExForNoResults : 'Showing 0 results for:',
-    generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`;},
-  },
-  // {
-  //   name              : 'www.telegraph.co.uk',
-  //   baseQuery         : 'https://www.telegraph.co.uk/search.html?q=',
-  //   regExForCount     : 'About ([\\d,]+) results', // About 5,460,000 results
-  //   regExForNoResults : 'No Results',
-  // },
-
-];
-
 const FAILED_SEARCH = '-1'; // to differentiate from actually finding a result of 0
 
-function generatePhrases() {
+function generatePhrases(spec) {
   const phrases = [];
+  let withPlurals = idiomsWithPlurals;
+  let standAlones  = standardCandles;
+  if (spec && ( spec.AXN.length > 0 || spec.SC.length > 0) ) {
+    withPlurals = spec.AXN;
+    standAlones = spec.SC;
+  }
 
-  idiomsWithPlurals.map( idiom => {
+  withPlurals.map( idiom => {
     singularNumbers.map( singularNumber => {
       phrases.push( `${idiom.basePhrase} ${singularNumber} ${idiom.singularNoun}` );
     });
@@ -92,18 +74,12 @@ function generatePhrases() {
     });
   });
 
-  standardCandles.map( candle => {
+  standAlones.map( candle => {
     phrases.push( candle );
   });
 
   return phrases;
 }
-
-const phrases = generatePhrases();
-
-sites.forEach( site => {
-  site.phrases = phrases;
-});
 
 function formatStats( sites ){
   const phraseCountsPerSite = [];
@@ -126,6 +102,7 @@ function formatStats( sites ){
   };
 }
 
+// this is broken: can't handle user-supplied spec
 function formatStatsGrouped( sites ){
   const phraseCountsPerSiteGrouped = [];
   const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
@@ -204,7 +181,36 @@ function formatStatsGrouped( sites ){
   };
 }
 
-function scanRaw(){
+function scanRaw( spec = {'AXN': [], 'SC': []} ){
+  const sites = [
+    {
+      name              : 'ft.com',
+      baseQuery         : 'https://www.ft.com/search?q=',
+      regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
+      regExForNoResults : 'No results found',
+      generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`;},
+    },
+    {
+      name              : 'www.nytimes.com',
+      baseQuery         : 'https://www.nytimes.com/search?query=',
+      regExForCount     : 'Showing ([\\d,]+) results? for:', // Showing 493,595 results for:
+      regExForNoResults : 'Showing 0 results for:',
+      generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`;},
+    },
+    // {
+    //   name              : 'www.telegraph.co.uk',
+    //   baseQuery         : 'https://www.telegraph.co.uk/search.html?q=',
+    //   regExForCount     : 'About ([\\d,]+) results', // About 5,460,000 results
+    //   regExForNoResults : 'No Results',
+    // },
+
+  ];
+  const phrases = generatePhrases(spec);
+
+  sites.forEach( site => {
+    site.phrases = phrases;
+  });
+
   let resultsObj = {};
 
   return scanForPhrases.raw( sites )
@@ -220,10 +226,10 @@ function scanRaw(){
     });
     return sites;
   })
-  .then( sites => {
-    resultsObj.formattedResultsGrouped = formatStatsGrouped( sites );
-    return sites;
-  })
+  // .then( sites => {
+  //   resultsObj.formattedResultsGrouped = formatStatsGrouped( sites );
+  //   return sites;
+  // })
   .then( sites => {
     return resultsObj;
   })
@@ -234,7 +240,4 @@ function scanRaw(){
 
 module.exports = {
   scanRaw,
-  config : {
-    sites,
-  }
 };
