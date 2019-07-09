@@ -131,6 +131,8 @@ app.use("/idioms/chart", (req, res) => {
     const frlcStringified = parsedResults.formattedResultsLineChart.stringified;
     frlcStringified.datasetsMaybeScaled
       = (unscaled)? frlcStringified.datasets : frlcStringified.scaledDatasets;
+    frlcStringified.titleMaybeScaled
+      = (unscaled)? frlcStringified.title : frlcStringified.scaledTitle;
     res.render('basicIdiomChart', parsedResults );
   })
   .catch( err => {

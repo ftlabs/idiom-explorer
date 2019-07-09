@@ -87,106 +87,6 @@ function generatePhrases(spec) {
   return phrases;
 }
 
-function formatStats( sites ){
-  const phraseCountsPerSite = [];
-  const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
-
-  // set column names
-  const columnNamesRow = ['phrase'];
-  sites.map( site => { columnNamesRow.push(site.name); });
-  phraseCountsPerSite.push( columnNamesRow );
-
-  // fill in copunts per phrase per site
-  phrases.map( phrase => {
-    const row = [ phrase ];
-    sites.map( site => { row.push(site.byPhrase[phrase].result); });
-    phraseCountsPerSite.push( row );
-  });
-
-  return {
-    phraseCountsPerSiteCsv : phraseCountsPerSite.map( row => { return row.join(','); } ),
-  };
-}
-
-// this is broken: can't handle user-supplied spec
-function formatStatsGrouped( sites ){
-  const phraseCountsPerSiteGrouped = [];
-  const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
-
-  // construct useful map to identify phraseTemplates from phrase
-  const phraseTemplateLookup = {}; // final word of phrase -> template
-  const templatePhrases = [];
-  idiomsWithPlurals.map( iwp => {
-      const templatePhrase = `${iwp.basePhrase} X ${iwp.pluralNoun}`;
-      templatePhrases.push(templatePhrase);
-      phraseTemplateLookup[iwp.singularNoun] = templatePhrase;
-      phraseTemplateLookup[iwp.pluralNoun] = templatePhrase;
-  });
-
-  const templatePhraseStandardCandle = 'standard candle';
-  // templatePhrases.push(templatePhraseStandardCandle);
-  standardCandles.map( sc => {
-    phraseTemplateLookup[sc] = templatePhraseStandardCandle;
-  });
-
-  // set column names
-  const columnNamesRow = ['phrase amount'];
-  templatePhrases.map( templatePhrase => {
-    sites.map( site => {
-      const siteTemplateName = `${templatePhrase} - ${site.name}`;
-      columnNamesRow.push(siteTemplateName);
-    });
-  });
-
-  phraseCountsPerSiteGrouped.push( columnNamesRow );
-
-  const countsByAmountsBySiteByTemplate = {};
-  phrases.map( phrase => {
-    const phraseWords = phrase.split(' ');
-    const finalPhraseWord = phraseWords.pop();
-    const templatePhrase = phraseTemplateLookup[finalPhraseWord];
-    if (templatePhrase == templatePhraseStandardCandle) {
-      return;
-    }
-    let amount = phraseWords.slice(2).join(' ');
-    if (amount == 'an' || amount == 'a') {
-      amount = 'a/an';
-    }
-
-    if (! countsByAmountsBySiteByTemplate.hasOwnProperty( amount )) {
-      countsByAmountsBySiteByTemplate[amount] = {};
-    }
-
-    sites.map( site => {
-      if (! countsByAmountsBySiteByTemplate[amount].hasOwnProperty(site.name)) {
-        countsByAmountsBySiteByTemplate[amount][site.name] = {};
-      }
-      if (amount == 'a/an'
-      && site.byPhrase[phrase].result < countsByAmountsBySiteByTemplate[amount][site.name][templatePhrase]) {
-        // skip;
-      } else {
-        countsByAmountsBySiteByTemplate[amount][site.name][templatePhrase] = site.byPhrase[phrase].result;
-      }
-    });
-  });
-
-  Object.keys( countsByAmountsBySiteByTemplate ).map( amount => {
-    const row = [ amount ];
-    Object.keys( countsByAmountsBySiteByTemplate[amount] ).map( siteName => {
-      Object.keys( countsByAmountsBySiteByTemplate[amount][siteName] ).map( templatePhrase => {
-        const count = countsByAmountsBySiteByTemplate[amount][siteName][templatePhrase];
-        row.push( count );
-      });
-    });
-    phraseCountsPerSiteGrouped.push( row );
-  });
-
-  return {
-    countsByAmountsBySiteByTemplate,
-    phraseCountsPerSiteGroupedCsv : phraseCountsPerSiteGrouped.map( row => { return row.join(','); } ),
-  };
-}
-
 function formatStatsForLineChart( sites, spec ){
   // divide phrases in to SC and not SC
   const allPhrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
@@ -263,13 +163,15 @@ function formatStatsForLineChart( sites, spec ){
 
   const axnSuffix = spec.AXN.map(axn => [axn.basePhrase, axn.singularNoun, axn.pluralNoun].join('|')).map(psv => `"${psv}"`).join(', ');
   const scSuffix  = (spec.SC)? ` scaled by ${spec.SC.map(sc => `"${sc}"`).join(', ')}` : '';
-  const title = `Comparing use of idioms on different news sites: ${axnSuffix}${scSuffix}`;
+  const title = `Comparing use of idioms on different news sites: ${axnSuffix}`;
+  const scaledTitle = `Comparing use of idioms on different news sites: ${axnSuffix}${scSuffix}`;
   return {
     spec,
     labels : phrases,
     datasets,
     scaledDatasets,
     title,
+    scaledTitle,
     allPhrases,
     phrasesSC,
     phrases,
@@ -277,7 +179,8 @@ function formatStatsForLineChart( sites, spec ){
       labels : JSON.stringify( phrases ),
       datasets : JSON.stringify(datasets),
       scaledDatasets : JSON.stringify(scaledDatasets),
-      title: JSON.stringify(title)
+      title: JSON.stringify(title),
+      scaledTitle: JSON.stringify(scaledTitle),
     },
     scStatsBySite,
   };
@@ -330,15 +233,14 @@ function scanRaw( spec = {'AXN': [], 'SC': []} ){
     });
     return sites;
   })
-  // .then( sites => {
-  //   resultsObj.formattedResultsGrouped = formatStatsGrouped( sites );
-  //   return sites;
-  // })
   .then( sites => {
     resultsObj.formattedResultsLineChart = formatStatsForLineChart( sites, spec );
     return sites;
   })
   .then( sites => {
+    resultsObj.formattedResults.stringified = {
+      phraseCountsPerSiteCsv : JSON.stringify(resultsObj.formattedResults.phraseCountsPerSiteCsv, null, 2),
+    }
     return resultsObj;
   })
   .catch( error => {

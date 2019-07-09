@@ -23,7 +23,7 @@ var myChart = new Chart(ctx, {
       responsive: false,
       title: {
         display: true,
-        text: {{{ formattedResultsLineChart.stringified.title }}}
+        text: {{{ formattedResultsLineChart.stringified.titleMaybeScaled }}}
       },
       scales: {
       xAxes: [{
@@ -38,6 +38,12 @@ var myChart = new Chart(ctx, {
 });
 
 </script>
+
+<h2>formatted data</h2>
+
+<pre>
+{{{ formattedResults.stringified.phraseCountsPerSiteCsv }}}
+</pre>
 
 </body>
 </html>
