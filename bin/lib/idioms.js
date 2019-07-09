@@ -47,18 +47,29 @@ const idiomsWithPlurals = [
   },
 ];
 
-const standardCandles = [ 'the', 'finance', 'abc', 'news', 'political', ];
+const standardCandles = [ 'finance', 'abc', 'news', 'political', ];
 
 const FAILED_SEARCH = '-1'; // to differentiate from actually finding a result of 0
 
 function generatePhrases(spec) {
-  const phrases = [];
-  let withPlurals = idiomsWithPlurals;
-  let standAlones  = standardCandles;
-  if (spec && ( spec.AXN.length > 0 || spec.SC.length > 0) ) {
-    withPlurals = spec.AXN;
-    standAlones = spec.SC;
+  if (! spec.hasOwnProperty('AXN')) {
+    spec.AXN = [];
   }
+  if (! spec.hasOwnProperty('SC')) {
+    spec.SC = [];
+  }
+
+  const initialAxnLength = spec.AXN.length;
+  const initialScLength  = spec.SC.length;
+
+  if (initialAxnLength === 0 && initialScLength === 0) {
+    spec.AXN = idiomsWithPlurals.slice(0,1);
+    spec.SC  = standardCandles.slice(0,1);
+  }
+
+  const phrases = [];
+  const withPlurals = spec.AXN;
+  const standAlones  = spec.SC;
 
   withPlurals.map( idiom => {
     singularNumbers.map( singularNumber => {
