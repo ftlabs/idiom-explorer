@@ -122,6 +122,26 @@ app.use("/idioms/raw", (req, res) => {
   ;
 });
 
+app.use("/idioms/chart", (req, res) => {
+  const spec = parseIdiomsSpec( req.query.spec );
+  const unscaled = (req.query.unscaled === 'true');
+  console.log(`INFO: /idioms/chart: spec=${JSON.stringify(spec)}`);
+  idioms.scanRaw(spec)
+  .then( parsedResults => {
+    const frlcStringified = parsedResults.formattedResultsLineChart.stringified;
+    frlcStringified.datasetsMaybeScaled
+      = (unscaled)? frlcStringified.datasets : frlcStringified.scaledDatasets;
+    frlcStringified.titleMaybeScaled
+      = (unscaled)? frlcStringified.title : frlcStringified.scaledTitle;
+    res.render('basicIdiomChart', parsedResults );
+  })
+  .catch( err => {
+    console.log( `ERROR: path=/idioms/chart, err=${err}`);
+    res.json( { err } );;
+  })
+  ;
+});
+
 // ---
 
 app.use("/", (req, res) => {

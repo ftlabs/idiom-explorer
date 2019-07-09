@@ -13,8 +13,11 @@
 
 <h3>idioms</h3>
 <ul>
-  <li>raw json data: GET <a href="/idioms/raw">/idioms/raw</a> (NB: this is all the idioms, and takes > 60s)</li>
+  <li>raw json data: GET <a href="/idioms/raw">/idioms/raw</a> (NB: this defaults to the according-to-sources idiom</li>
   <li>raw json data with spec: GET <a href="/idioms/raw?spec=AXN:according%20to,source,sources|SC:finance">/idioms/raw?spec=AXN:according%20to,source,sources|SC:finance</a> (NB: AXN=adverb singular plural, SC=standard candle)</li>
+  <li>chart: GET <a href="/idioms/chart">/idioms/chart</a> (NB: this defaults to the according-to-sources idiom</li>
+  <li>chart with spec (scaled by default: GET <a href="/idioms/chart?spec=AXN:according%20to,source,sources|SC:finance">/idioms/raw?spec=AXN:according%20to,source,sources|SC:finance</a> (NB: AXN=adverb singular plural, SC=standard candle)</li>
+  <li>chart with spec unscaled: GET <a href="/idioms/chart?spec=AXN:according%20to,source,sources|SC:finance&unscaled=true">/idioms/raw?spec=AXN:according%20to,source,sources|SC:finance&unscaled=true</a> (NB: AXN=adverb singular plural, SC=standard candle)</li>
 </ul>
 </p>
 
