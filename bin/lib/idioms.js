@@ -172,7 +172,7 @@ function formatStatsForLineChart( sites, spec ){
     });
   });
 
-  const axnSuffix = spec.AXN.map(axn => [axn.basePhrase, axn.singularNoun, axn.pluralNoun].join('|')).map(psv => `"${psv}"`).join(', ');
+  const axnSuffix = spec.AXN.map(axn => [axn.basePhrase, axn.singularNoun, axn.pluralNoun].join(',')).map(psv => `"${psv}"`).join(', ');
   const scSuffix  = (spec.SC)? ` scaled by ${spec.SC.map(sc => `"${sc}"`).join(', ')}` : '';
   const title = `Comparing use of idioms on different news sites: ${axnSuffix}`;
   const scaledTitle = `Comparing use of idioms on different news sites: ${axnSuffix}${scSuffix}`;
