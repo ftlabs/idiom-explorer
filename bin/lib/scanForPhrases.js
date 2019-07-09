@@ -9,6 +9,34 @@ const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MI
 
 const fetch = require('node-fetch');
 
+const CACHED_QUERIES = {};
+function cachedFetch( query ){
+  const queryKey = JSON.stringify(query);
+  if (cachedFetch.hasOwnProperty( queryKey )) {
+    return Promise.resolve( cachedFetch[queryKey] )
+    .then( res => {
+      console.log( `fetch: [cached] query: (${res.status}) ${query}` );
+      return res;
+    })
+  } else {
+    return fetch(query)
+    .then( res => {
+      console.log( `fetch: query: (${res.status}) ${query}` );
+      const status = res.status;
+      const text   = res.text();
+      const cacheableRes = {
+        status,
+        text : () => { return text; }
+      };
+
+      if (res.status === 200) {
+        cachedFetch[queryKey] = cacheableRes;
+      }
+      return cacheableRes;
+    })
+  }
+}
+
 const FAILED_SEARCH = '-1'; // to differentiate from actually finding a result of 0
 
 function generateSiteQueriesForAllPhrases( site ){
@@ -35,9 +63,8 @@ function searchForSitePhrase( site, phraseObj ){
   const regExForNoResults  = new RegExp( site.regExForNoResults  );
 
   const startMillis = Date.now();
-  return fetch( query )
+  return cachedFetch( query )
   .then( res => {
-    console.log( `fetch: query: (${res.status}) ${query}` );
     phraseObj.status = res.status;
     phraseObj.durationMillis = Date.now() - startMillis;
     return res;
