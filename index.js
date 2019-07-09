@@ -123,7 +123,17 @@ app.use("/idioms/raw", (req, res) => {
 });
 
 app.use("/idioms/chart", (req, res) => {
-  res.render('basicIdiomChart', {} );
+  const spec = parseIdiomsSpec( req.query.spec );
+  console.log(`INFO: /idioms/raw: spec=${JSON.stringify(spec)}`);
+  idioms.scanRaw(spec)
+  .then( parsedResults => {
+    res.render('basicIdiomChart', parsedResults );
+  })
+  .catch( err => {
+    console.log( `ERROR: path=/idioms/raw, err=${err}`);
+    res.json( { err } );;
+  })
+  ;
 });
 
 // ---

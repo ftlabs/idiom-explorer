@@ -181,10 +181,41 @@ function formatStatsGrouped( sites ){
   };
 }
 
+function formatStatsForLineChart( sites ){
+  const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
+  const datasets = [];
+  sites.map( site => {
+    const dataset = {
+      label: site.name,
+      data: [],
+      fill: false,
+      borderColor: site.borderColor,
+    };
+    datasets.push(dataset);
+    phrases.map( phrase => {
+      const count = parseInt(site.byPhrase[phrase].result);
+      dataset.data.push(count);
+    });
+  });
+
+  const title = 'a simple view comparing use of idioms on different news sites';
+  return {
+    labels : phrases,
+    datasets,
+    title,
+    stringified : {
+      labels : JSON.stringify( phrases ),
+      datasets : JSON.stringify(datasets),
+      title: JSON.stringify(title)
+    }
+  };
+}
+
 function scanRaw( spec = {'AXN': [], 'SC': []} ){
   const sites = [
     {
       name              : 'ft.com',
+      borderColor       : 'orange',
       baseQuery         : 'https://www.ft.com/search?q=',
       regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
       regExForNoResults : 'No results found',
@@ -192,6 +223,7 @@ function scanRaw( spec = {'AXN': [], 'SC': []} ){
     },
     {
       name              : 'www.nytimes.com',
+      borderColor       : 'black',
       baseQuery         : 'https://www.nytimes.com/search?query=',
       regExForCount     : 'Showing ([\\d,]+) results? for:', // Showing 493,595 results for:
       regExForNoResults : 'Showing 0 results for:',
@@ -230,6 +262,10 @@ function scanRaw( spec = {'AXN': [], 'SC': []} ){
   //   resultsObj.formattedResultsGrouped = formatStatsGrouped( sites );
   //   return sites;
   // })
+  .then( sites => {
+    resultsObj.formattedResultsLineChart = formatStatsForLineChart( sites );
+    return sites;
+  })
   .then( sites => {
     return resultsObj;
   })
