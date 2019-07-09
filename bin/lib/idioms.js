@@ -181,10 +181,57 @@ function formatStatsGrouped( sites ){
   };
 }
 
-function formatStatsForLineChart( sites ){
-  const phrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
-  const datasets = [];
+function formatStatsForLineChart( sites, spec ){
+  // divide phrases in to SC and not SC
+  const allPhrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
+  const phrasesSC = [];
+  const phrases = [];
+
+  allPhrases.map( phrase => {
+    if( spec.SC.includes(phrase) ){
+      phrasesSC.push( phrase );
+    } else {
+      phrases.push( phrase );
+    }
+  });
+
+  // if no SC, then scale everything by 1 (to leave it unchanged)
+  // if there is at least one SC, find the average value for each site, noting the one for ft.com
+  // then divide all the others by the ft average to scale them to the ft, then divide each of their counts by that scale
+
+  const scStatsBySite = {};
+  let ftComSite;
+  sites.map( site => { // get SC counts per site, and identify the ft.com site
+    const scStats = {};
+    scStatsBySite[site.name] = scStats;
+    if (site.name === 'ft.com') {
+      ftComSite = site;
+    }
+    scStats.counts = phrasesSC.map( phrase => parseInt(site.byPhrase[phrase].result) );
+  });
+
+  const ftComScStats = scStatsBySite[ftComSite.name];
   sites.map( site => {
+    scStats = scStatsBySite[site.name];
+
+    if (phrasesSC.length == 0) {
+      scStats.countsRelativeToFtCom = [1.0];
+      // scStats.avgRelToFtCom  = 1.0;
+    } else {
+      scStats.countsRelativeToFtCom = phrasesSC.map( (phrase, phraseIndex) => {
+        return (ftComScStats.counts[phraseIndex] <= 0 || scStats.counts[phraseIndex] <= 0)? 1.0 : scStats.counts[phraseIndex] / ftComScStats.counts[phraseIndex];
+      });
+    }
+
+    const sum = scStats.countsRelativeToFtCom.reduce((a, b) => a + b );
+    const avg = sum / scStats.countsRelativeToFtCom.length;
+    scStats.avgRatioCountsRelativeToFtCom = avg;
+  });
+
+  const datasets = [];
+  const scaledDatasets = [];
+  sites.map( site => {
+    scStats = scStatsBySite[site.name];
     const dataset = {
       label: site.name,
       data: [],
@@ -192,22 +239,41 @@ function formatStatsForLineChart( sites ){
       borderColor: site.borderColor,
     };
     datasets.push(dataset);
+    const scaledTitleSuffix = (scStats.avgRatioCountsRelativeToFtCom === 1.0)? '' : ` (divided by ${scStats.avgRatioCountsRelativeToFtCom.toFixed(1)})`;
+    const scaledDataset = {
+      label: `${site.name}${scaledTitleSuffix}`,
+      data: [],
+      fill: false,
+      borderColor: site.borderColor,
+    };
+    scaledDatasets.push(scaledDataset);
+
     phrases.map( phrase => {
       const count = parseInt(site.byPhrase[phrase].result);
       dataset.data.push(count);
+      scaledDataset.data.push( count / scStats.avgRatioCountsRelativeToFtCom );
     });
   });
 
-  const title = 'a simple view comparing use of idioms on different news sites';
+  const axnSuffix = spec.AXN.map(axn => [axn.basePhrase, axn.singularNoun, axn.pluralNoun].join('|')).map(psv => `"${psv}"`).join(', ');
+  const scSuffix  = (spec.SC)? ` scaled by ${spec.SC.map(sc => `"${sc}"`).join(', ')}` : '';
+  const title = `Comparing use of idioms on different news sites: ${axnSuffix}${scSuffix}`;
   return {
+    spec,
     labels : phrases,
     datasets,
+    scaledDatasets,
     title,
+    allPhrases,
+    phrasesSC,
+    phrases,
     stringified : {
       labels : JSON.stringify( phrases ),
       datasets : JSON.stringify(datasets),
+      scaledDatasets : JSON.stringify(scaledDatasets),
       title: JSON.stringify(title)
-    }
+    },
+    scStatsBySite,
   };
 }
 
@@ -263,7 +329,7 @@ function scanRaw( spec = {'AXN': [], 'SC': []} ){
   //   return sites;
   // })
   .then( sites => {
-    resultsObj.formattedResultsLineChart = formatStatsForLineChart( sites );
+    resultsObj.formattedResultsLineChart = formatStatsForLineChart( sites, spec );
     return sites;
   })
   .then( sites => {

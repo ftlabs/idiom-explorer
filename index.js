@@ -124,13 +124,17 @@ app.use("/idioms/raw", (req, res) => {
 
 app.use("/idioms/chart", (req, res) => {
   const spec = parseIdiomsSpec( req.query.spec );
-  console.log(`INFO: /idioms/raw: spec=${JSON.stringify(spec)}`);
+  const unscaled = (req.query.unscaled === 'true');
+  console.log(`INFO: /idioms/chart: spec=${JSON.stringify(spec)}`);
   idioms.scanRaw(spec)
   .then( parsedResults => {
+    const frlcStringified = parsedResults.formattedResultsLineChart.stringified;
+    frlcStringified.datasetsMaybeScaled
+      = (unscaled)? frlcStringified.datasets : frlcStringified.scaledDatasets;
     res.render('basicIdiomChart', parsedResults );
   })
   .catch( err => {
-    console.log( `ERROR: path=/idioms/raw, err=${err}`);
+    console.log( `ERROR: path=/idioms/chart, err=${err}`);
     res.json( { err } );;
   })
   ;

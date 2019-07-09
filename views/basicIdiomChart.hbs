@@ -17,7 +17,7 @@ var myChart = new Chart(ctx, {
   type: 'line',
   data: {
     labels: {{{ formattedResultsLineChart.stringified.labels }}},
-    datasets: {{{ formattedResultsLineChart.stringified.datasets }}}
+    datasets: {{{ formattedResultsLineChart.stringified.datasetsMaybeScaled }}}
   },
   options: {
       responsive: false,
