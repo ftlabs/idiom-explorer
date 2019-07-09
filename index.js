@@ -122,6 +122,10 @@ app.use("/idioms/raw", (req, res) => {
   ;
 });
 
+app.use("/idioms/chart", (req, res) => {
+  res.render('basicIdiomChart', {} );
+});
+
 // ---
 
 app.use("/", (req, res) => {

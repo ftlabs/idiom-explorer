@@ -1,0 +1,113 @@
+<!DOCTYPE>
+<html>
+<head>
+  <title>Basic Idiom Chart from https://tobiasahlin.com/blog/chartjs-charts-to-get-you-started/</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+</head>
+<body>
+
+<canvas id="myChart" width="800" height="600"></canvas>
+
+<style type="text/css">
+{
+  data: africa,
+  label: "Africa",
+  borderColor: "#3e95cd",
+  fill: false
+},
+{
+  data: asia,
+  label: "Asia",
+  borderColor: "#3e95cd",
+  fill: false
+},
+{
+  data: europe,
+  label: "Europe",
+  borderColor: "#3e95cd",
+  fill: false
+},
+{
+  data: latinAmerica,
+  label: "Latin America",
+  borderColor: "#3e95cd",
+  fill: false
+},
+{
+  data: northAmerica,
+  label: "North America",
+  borderColor: "#3e95cd",
+  fill: false
+}
+</style>
+
+<script>
+  // Our labels along the x-axis
+var years = [1500,1600,1700,1750,1800,1850,1900,1950,1999,2050];
+// For drawing the lines
+var africa = [86,114,106,106,107,111,133,221,783,2478];
+var asia = [282,350,411,502,635,809,947,1402,3700,5267];
+var europe = [168,170,178,190,203,276,408,547,675,734];
+var latinAmerica = [40,20,10,16,24,38,74,167,508,784];
+var northAmerica = [6,3,2,2,7,26,82,172,312,433];
+
+var ctx = document.getElementById("myChart");
+var myChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'Africa',
+        data: africa,
+        fill: false,
+        borderColor: "#3e95cd",
+      },
+      {
+        label: 'Asia',
+        data: asia,
+        fill: false,
+        borderColor: "#8e5ea2"
+      },
+      {
+        label: 'Europe',
+        data: europe,
+        fill: false,
+        borderColor: "#3cba9f"
+      },
+      {
+        label: 'Latin America',
+        data: latinAmerica,
+        fill: false,
+        borderColor: "#e8c3b9"
+      },
+      {
+        label: 'North America',
+        data: northAmerica,
+        fill: false,
+        borderColor: "#c45850"
+      },
+    ]
+  },
+  options: {
+      responsive: false,
+      title: {
+        display: true,
+        text: 'World population per region (in millions)'
+      },
+      scales: {
+      xAxes: [{
+        ticks: {
+          maxRotation: 90,
+          minRotation: 90
+        }
+      }]
+    }
+
+  }
+});
+
+</script>
+
+</body>
+</html>
