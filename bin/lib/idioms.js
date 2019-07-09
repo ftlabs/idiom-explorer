@@ -62,6 +62,12 @@ function generatePhrases(spec) {
 
   withPlurals.map( idiom => {
     singularNumbers.map( singularNumber => {
+      if (singularNumber === 'a' && idiom.singularNoun.match(/^[aeiouh]/)) {
+        return;
+      }
+      if (singularNumber === 'an' && !idiom.singularNoun.match(/^[aeiouh]/)) {
+        return;
+      }
       phrases.push( `${idiom.basePhrase} ${singularNumber} ${idiom.singularNoun}` );
     });
 
