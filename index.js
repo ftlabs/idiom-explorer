@@ -67,6 +67,8 @@ app.use("/typos/tidy", (req, res) => {
   ;
 });
 
+// ---
+
 function parseIdiomsSpec( specText = '' ){
   // AXN -> adverb number noun
   // SC -> standard candle
@@ -143,6 +145,17 @@ app.use("/idioms/chart", (req, res) => {
   })
   ;
 });
+
+// ---
+
+app.use("/admin/flushallcaches", (req, res) => {
+  const flushes = {
+    idioms : idioms.flushCache(),
+    scanForPhrases : scanForPhrases.flushCache(),
+  }
+  res.json( { 'num keys flushed' : flushes});
+});
+
 
 // ---
 

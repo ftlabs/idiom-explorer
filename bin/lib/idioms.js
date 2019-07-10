@@ -283,8 +283,15 @@ function cachedScanRaw( spec = {'AXN': [], 'SC': []} ){
   }
 }
 
+function flushCache(){
+  const keys = Object.keys(CACHED_SCANRAW);
+  keys.map( key => { delete CACHED_SCANRAW[key]; })
+  return keys.length;
+}
+
 module.exports = {
   scanRaw: cachedScanRaw,
   candidateAXNs : idiomsWithPlurals.map( idiom => [idiom.basePhrase, idiom.singularNoun,idiom.pluralNoun].join(',')),
   candidateSCs  : standardCandles,
+  flushCache,
 };
