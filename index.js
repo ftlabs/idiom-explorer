@@ -67,10 +67,6 @@ app.use("/typos/tidy", (req, res) => {
   ;
 });
 
-app.use("/idioms/config", (req, res) => {
-  res.json(idioms.config);
-});
-
 function parseIdiomsSpec( specText = '' ){
   // AXN -> adverb number noun
   // SC -> standard candle
@@ -125,6 +121,7 @@ app.use("/idioms/raw", (req, res) => {
 app.use("/idioms/chart", (req, res) => {
   const spec = parseIdiomsSpec( req.query.spec );
   const unscaled = (req.query.unscaled === 'true');
+  const yAxisLogarithmic = (req.query.yaxistype === 'logarithmic');
   console.log(`INFO: /idioms/chart: spec=${JSON.stringify(spec)}`);
   idioms.scanRaw(spec)
   .then( parsedResults => {
@@ -133,6 +130,8 @@ app.use("/idioms/chart", (req, res) => {
       = (unscaled)? frlcStringified.datasets : frlcStringified.scaledDatasets;
     frlcStringified.titleMaybeScaled
       = (unscaled)? frlcStringified.title : frlcStringified.scaledTitle;
+    frlcStringified.yAxisType
+      = JSON.stringify( (yAxisLogarithmic)? 'logarithmic' : 'linear' );
     res.render('basicIdiomChart', parsedResults );
   })
   .catch( err => {

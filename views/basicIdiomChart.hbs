@@ -31,6 +31,16 @@ var myChart = new Chart(ctx, {
           maxRotation: 90,
           minRotation: 90
         }
+      }],
+      yAxes: [{
+        type: {{{ formattedResultsLineChart.stringified.yAxisType }}}, // NB axes vs axis
+        ticks: {
+           // min: 0.1, //minimum tick
+           // max: 1000, //maximum tick
+           callback: function (value, index, values) {
+               return Number(value.toString());//pass tick values as a string into Number function
+           }
+        },
       }]
     }
 
