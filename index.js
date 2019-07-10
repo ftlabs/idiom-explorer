@@ -132,6 +132,7 @@ app.use("/idioms/chart", (req, res) => {
       = (unscaled)? frlcStringified.title : frlcStringified.scaledTitle;
     frlcStringified.yAxisType
       = JSON.stringify( (yAxisLogarithmic)? 'logarithmic' : 'linear' );
+
     res.render('basicIdiomChart', parsedResults );
   })
   .catch( err => {
@@ -144,7 +145,24 @@ app.use("/idioms/chart", (req, res) => {
 // ---
 
 app.use("/", (req, res) => {
-  res.render("index");
+  const config = {};
+  // /idioms/chart?spec=AXN:according%20to,source,sources|SC:finance&unscaled=true&yaxistype=logarithmic
+  const candidateAXNs = idioms.candidateAXNs;
+  const candidateSCs  = idioms.candidateSCs;
+  const primarySC = candidateSCs[0];
+  const urlMissingSpec = '/idioms/chart?unscaled=true&yaxistype=logarithmic&spec=';
+  const candidateSpecs = candidateAXNs.map( axn => `AXN:${axn}|SC:${primarySC}`);
+  config.candidateChartSpecAndUrls = candidateSpecs.map( spec => {
+    return {
+      spec,
+      stringifiedSpec: JSON.stringify(spec),
+      url: `${urlMissingSpec}${spec}`,
+      stringifiedUrl: JSON.stringify(`${urlMissingSpec}${spec}`),
+    }
+  });
+  console.log(`/: config.candidateChartSpecAndUrls=${JSON.stringify(config.candidateChartSpecAndUrls,null,2)}`);
+
+  res.render("index", config);
 });
 
 app.use((err, req, res, next) => {

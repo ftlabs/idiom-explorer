@@ -10,11 +10,6 @@ const pluralAmounts   = [ 'many', 'some', 'a few', 'dozens of', 'half a dozen', 
 // const pluralAmounts   = [ 'many', 'some', ];
 
 const idiomsWithPlurals = [
-  // {
-  //   basePhrase   : 'according to',
-  //   singularNoun : 'person',
-  //   pluralNoun   : 'people',
-  // },
   {
     basePhrase   : 'according to',
     singularNoun : 'source',
@@ -44,6 +39,11 @@ const idiomsWithPlurals = [
     basePhrase   : 'according to',
     singularNoun : 'analyst',
     pluralNoun   : 'analysts',
+  },
+  {
+    basePhrase   : 'according to',
+    singularNoun : 'person',
+    pluralNoun   : 'people',
   },
 ];
 
@@ -261,4 +261,6 @@ function scanRaw( spec = {'AXN': [], 'SC': []} ){
 
 module.exports = {
   scanRaw,
+  candidateAXNs : idiomsWithPlurals.map( idiom => [idiom.basePhrase, idiom.singularNoun,idiom.pluralNoun].join(',')),
+  candidateSCs  : standardCandles,
 };
