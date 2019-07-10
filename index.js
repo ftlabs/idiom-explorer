@@ -67,6 +67,8 @@ app.use("/typos/tidy", (req, res) => {
   ;
 });
 
+// ---
+
 function parseIdiomsSpec( specText = '' ){
   // AXN -> adverb number noun
   // SC -> standard candle
@@ -133,6 +135,8 @@ app.use("/idioms/chart", (req, res) => {
     frlcStringified.yAxisType
       = JSON.stringify( (yAxisLogarithmic)? 'logarithmic' : 'linear' );
 
+    parsedResults.formattedResultsLineChart.chartType = (parsedResults.formattedResultsLineChart.scOnly)? 'bar' : 'line';
+
     res.render('basicIdiomChart', parsedResults );
   })
   .catch( err => {
@@ -141,6 +145,17 @@ app.use("/idioms/chart", (req, res) => {
   })
   ;
 });
+
+// ---
+
+app.use("/admin/flushallcaches", (req, res) => {
+  const flushes = {
+    idioms : idioms.flushCache(),
+    scanForPhrases : scanForPhrases.flushCache(),
+  }
+  res.json( { 'num keys flushed' : flushes});
+});
+
 
 // ---
 
@@ -160,7 +175,6 @@ app.use("/", (req, res) => {
       stringifiedUrl: JSON.stringify(`${urlMissingSpec}${spec}`),
     }
   });
-  console.log(`/: config.candidateChartSpecAndUrls=${JSON.stringify(config.candidateChartSpecAndUrls,null,2)}`);
 
   res.render("index", config);
 });

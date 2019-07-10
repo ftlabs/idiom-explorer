@@ -12,8 +12,8 @@ const fetch = require('node-fetch');
 const CACHED_QUERIES = {};
 function cachedFetch( query ){
   const queryKey = JSON.stringify(query);
-  if (cachedFetch.hasOwnProperty( queryKey )) {
-    return Promise.resolve( cachedFetch[queryKey] )
+  if (CACHED_QUERIES.hasOwnProperty( queryKey )) {
+    return Promise.resolve( CACHED_QUERIES[queryKey] )
     .then( res => {
       console.log( `fetch: [cached] query: (${res.status}) ${query}` );
       return res;
@@ -30,7 +30,7 @@ function cachedFetch( query ){
       };
 
       if (res.status === 200) {
-        cachedFetch[queryKey] = cacheableRes;
+        CACHED_QUERIES[queryKey] = cacheableRes;
       }
       return cacheableRes;
     })
@@ -191,6 +191,13 @@ function raw(sites) {
   });
 }
 
+function flushCache(){
+  const keys = Object.keys(CACHED_QUERIES);
+  keys.map( key => { delete CACHED_QUERIES[key]; })
+  return keys.length;
+}
+
 module.exports = {
   raw,
+  flushCache,
 };
