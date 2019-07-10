@@ -101,18 +101,20 @@ function generatePhrases(spec) {
 function formatStatsForLineChart( sites, spec ){
   // divide phrases in to SC and not SC
   const allPhrases = Object.keys( sites[0].byPhrase ); // read common list of phrases from 1st site
-  const phrasesSC = [];
-  const phrases = [];
+  const phrasesSC  = [];
+  const phrasesAXN = [];
 
   allPhrases.map( phrase => {
     if( spec.SC.includes(phrase) ){
       phrasesSC.push( phrase );
     } else {
-      phrases.push( phrase );
+      phrasesAXN.push( phrase );
     }
   });
 
-  // if no SC, then scale everything by 1 (to leave it unchanged)
+  const phrases = (phrasesAXN.length > 0)? phrasesAXN : phrasesSC; // to handle SC-only spec
+
+  // if no SC, or no AXN, then scale everything by 1 (to leave it unchanged)
   // if there is at least one SC, find the average value for each site, noting the one for ft.com
   // then divide all the others by the ft average to scale them to the ft, then divide each of their counts by that scale
 
@@ -131,7 +133,7 @@ function formatStatsForLineChart( sites, spec ){
   sites.map( site => {
     scStats = scStatsBySite[site.name];
 
-    if (phrasesSC.length == 0) {
+    if (phrasesSC.length == 0 || phrasesAXN.length == 0) {
       scStats.countsRelativeToFtCom = [1.0];
       // scStats.avgRelToFtCom  = 1.0;
     } else {
@@ -154,6 +156,7 @@ function formatStatsForLineChart( sites, spec ){
       data: [],
       fill: false,
       borderColor: site.borderColor,
+      backgroundColor: site.borderColor,
     };
     datasets.push(dataset);
     const scaledTitleSuffix = (scStats.avgRatioCountsRelativeToFtCom === 1.0)? '' : ` (divided by ${scStats.avgRatioCountsRelativeToFtCom.toFixed(1)})`;
@@ -194,6 +197,7 @@ function formatStatsForLineChart( sites, spec ){
       scaledTitle: JSON.stringify(scaledTitle),
     },
     scStatsBySite,
+    scOnly : (phrasesAXN.length == 0),
   };
 }
 

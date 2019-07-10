@@ -14,7 +14,7 @@
 <script>
 var ctx = document.getElementById("myChart");
 var myChart = new Chart(ctx, {
-  type: 'line',
+  type: '{{formattedResultsLineChart.chartType}}',
   data: {
     labels: {{{ formattedResultsLineChart.stringified.labels }}},
     datasets: {{{ formattedResultsLineChart.stringified.datasetsMaybeScaled }}}
@@ -35,7 +35,7 @@ var myChart = new Chart(ctx, {
       yAxes: [{
         type: {{{ formattedResultsLineChart.stringified.yAxisType }}}, // NB axes vs axis
         ticks: {
-           // min: 0.1, //minimum tick
+           // min: 0, //minimum tick
            // max: 1000, //maximum tick
            callback: function (value, index, values) {
                return Number(value.toString());//pass tick values as a string into Number function

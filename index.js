@@ -133,6 +133,8 @@ app.use("/idioms/chart", (req, res) => {
     frlcStringified.yAxisType
       = JSON.stringify( (yAxisLogarithmic)? 'logarithmic' : 'linear' );
 
+    parsedResults.formattedResultsLineChart.chartType = (parsedResults.formattedResultsLineChart.scOnly)? 'bar' : 'line';
+
     res.render('basicIdiomChart', parsedResults );
   })
   .catch( err => {
