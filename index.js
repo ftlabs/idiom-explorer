@@ -160,7 +160,6 @@ app.use("/", (req, res) => {
       stringifiedUrl: JSON.stringify(`${urlMissingSpec}${spec}`),
     }
   });
-  console.log(`/: config.candidateChartSpecAndUrls=${JSON.stringify(config.candidateChartSpecAndUrls,null,2)}`);
 
   res.render("index", config);
 });

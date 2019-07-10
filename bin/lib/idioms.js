@@ -259,8 +259,28 @@ function scanRaw( spec = {'AXN': [], 'SC': []} ){
   });
 }
 
+const CACHED_SCANRAW = {};
+
+function cachedScanRaw( spec = {'AXN': [], 'SC': []} ){
+  const specKey = JSON.stringify(spec);
+  if (CACHED_SCANRAW.hasOwnProperty( specKey )) {
+    return Promise.resolve()
+    .then( () => {
+      console.log(`cachedScanRaw: from cache: specKey=${specKey}`);
+      return CACHED_SCANRAW[specKey];
+    });
+  } else {
+    return scanRaw( spec )
+    .then( sr => {
+      console.log(`cachedScanRaw: uncached: specKey=${specKey}`);
+      CACHED_SCANRAW[specKey] = sr;
+      return sr;
+    })
+  }
+}
+
 module.exports = {
-  scanRaw,
+  scanRaw: cachedScanRaw,
   candidateAXNs : idiomsWithPlurals.map( idiom => [idiom.basePhrase, idiom.singularNoun,idiom.pluralNoun].join(',')),
   candidateSCs  : standardCandles,
 };
