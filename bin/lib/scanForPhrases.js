@@ -10,9 +10,9 @@ const SITE_FETCH_DELAY_MILLIS = (process.env.hasOwnProperty('SITE_FETCH_DELAY_MI
 const fetch = require('node-fetch');
 
 const CACHED_QUERIES = {};
-function cachedFetch( query ){
+function cachedFetch( query, useCached=true ){
   const queryKey = JSON.stringify(query);
-  if (CACHED_QUERIES.hasOwnProperty( queryKey )) {
+  if (useCached && CACHED_QUERIES.hasOwnProperty( queryKey )) {
     return Promise.resolve( CACHED_QUERIES[queryKey] )
     .then( res => {
       console.log( `fetch: [cached] query: (${res.status}) ${query}` );
@@ -63,7 +63,7 @@ function searchForSitePhrase( site, phraseObj ){
   const regExForNoResults  = new RegExp( site.regExForNoResults  );
 
   const startMillis = Date.now();
-  return cachedFetch( query )
+  return cachedFetch( query, !site.useUncached )
   .then( res => {
     phraseObj.status = res.status;
     phraseObj.durationMillis = Date.now() - startMillis;
