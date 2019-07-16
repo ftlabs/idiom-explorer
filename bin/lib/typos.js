@@ -128,6 +128,7 @@ const sites = [
     notTypos,
     generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`; },
     phrases : typos,
+    useUncached : true,
   },
 
 ];
