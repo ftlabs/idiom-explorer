@@ -5,8 +5,8 @@
 <h3>Look for standard typos</h3>
 <p>There will be a delay whilst the site's search is poked repeatedly.</p>
 <ul>
-  <li>raw json data: GET <a href="/typos/raw">/typos/raw</a></li>
-  <li>tidy view: GET <a href="/typos/tidy">/typos/tidy</a></li>
+  <li>raw json data: GET <a href="/typos/raw">/typos/raw</a> (also ?maxdays=31)</li>
+  <li>tidy view: GET <a href="/typos/tidy">/typos/tidy</a> (also ?maxdays=31)</li>
   <li>config: GET <a href="/typos/config">/typos/config</a></li>
 </ul>
 </p>
@@ -27,6 +27,15 @@
       {{/each}}
     </ul>
   </li>
+</ul>
+<p>
+Notes:
+<ul>
+  <li>AXN refers adverb/number/noun, and requires a csv of adverb text, singular noun, plural noun.</li>
+  <li>SC refers to 'standard candle' (ref astronomy), and is just a standalone phrase. </li>
+  <li>Multiple AXN and SC instances can be specified as pipe-separated, but probably best to only specify the one AXN, otherwise the graph will look messy.
+  <li>If the query is 'scaled' (default, i.e. not unscaled=true), any specified SC values are averaged and used to scale non-ft.com site stats for the AXN.</li>
+  <li>yaxistype=logarithmic is an alternative to scaling. </li>
 </ul>
 </p>
 

@@ -40,7 +40,9 @@ if (process.env.BYPASS_TOKEN !== "true") {
 //Core Routes
 
 app.use("/typos/raw", (req, res) => {
-  typos.scanRaw()
+  const maxDays = req.query.hasOwnProperty('maxdays')? parseInt(req.query.maxdays) : null;
+
+  typos.scanRaw(maxDays)
   .then( sites => {
     res.json(sites);
   })
@@ -56,7 +58,9 @@ app.use("/typos/config", (req, res) => {
 });
 
 app.use("/typos/tidy", (req, res) => {
-  typos.scanRaw()
+  const maxDays = req.query.hasOwnProperty('maxdays')? parseInt(req.query.maxdays) : null;
+  
+  typos.scanRaw(maxDays)
   .then( sites => {
     res.render('tidyTypos', { sites });
   })
