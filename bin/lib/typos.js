@@ -69,69 +69,18 @@ const standardCandles = [
   'business',
 ];
 
-let maxDays = 7;
+let MAXDAYS = 7;
 if (process.env.hasOwnProperty('MAXDAYS' )) {
   const numDays = parseInt( process.env.MAXDAYS );
   if (numDays > 0) {
-    maxDays = numDays;
-    console.log( `INFO: MAXDAYS specified in env: ${maxDays}`);
+    MAXDAYS = numDays;
+    console.log( `INFO: MAXDAYS specified in env: ${MAXDAYS}`);
   } else {
-    console.log( `WARNING: MAXDAYS specified in env, but failed to parse as a +ve int: defaulting to ${maxDays}`);
+    console.log( `WARNING: MAXDAYS specified in env, but failed to parse as a +ve int: defaulting to ${MAXDAYS}`);
   }
 } else  {
-  console.log( `INFO: MAXDAYS not specified in env: defaulting to ${maxDays}`);
+  console.log( `INFO: MAXDAYS not specified in env: defaulting to ${MAXDAYS}`);
 }
-
-
-// <div class="search-item">
-//  <div class="search-item__teaser">
-//   <div class="o-teaser o-teaser--article o-teaser--small o-teaser--has-image js-teaser" data-id="21281750-87e6-11e9-a028-86cea8523dc2">
-//    <div class="o-teaser__content">
-//     <div class="o-teaser__meta">
-//      <div class="o-teaser__meta-tag">
-//       <a class="o-teaser__tag" data-trackable="teaser-tag" href="/global-economy">Global Economy</a>
-//      </div>
-//     </div>
-//     <div class="o-teaser__heading">
-//      <a href="/content/21281750-87e6-11e9-a028-86cea8523dc2" data-trackable="heading-link" class="js-teaser-heading-link">Australia trade surplus misses estimates in April</a>
-//     </div>
-//     <p class="o-teaser__standfirst">
-//      <a href="/content/21281750-87e6-11e9-a028-86cea8523dc2" data-trackable="standfirst-link" tabindex="-1" class="js-teaser-standfirst-link">
-//       <span>....87bn ($3.4bn), according to the Australian Bureau Statistics published on Thursday. That was down from the $4.95bn surplus recorded in March and below <mark class="search-item__highlight">the</mark> <mark class="search-item__highlight">A</mark>$5.1bn forecast in a Reuters poll.
-//
-// Exports...</span>
-//      </a>
-//     </p>
-//     <div class="o-teaser__timestamp">
-//      <time class="o-teaser__timestamp-date" datetime="2019-06-06T02:17:11+0000">June 6, 2019</time>
-//     </div>
-
-const sites = [
-  {
-    name              : 'ft.com',
-    baseQuery         : `https://www.ft.com/search?dateRange=now-${maxDays}d&q=`,
-    maxDays,
-    regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
-    regExForNoResults : 'No results found',
-    regExForEachResult : [
-      'class=\"search-item\"',
-      'class=\"o-teaser__tag\"[^>]+>([^<]+)<', // section
-      'class=\"o-teaser__heading\"',
-      '<a href=\"([^\"]+)\"[^>]+>([^<]+)<', // path, heading
-      'class=\"o-teaser__standfirst\"',
-      '<a.*?<span>(', // standfirst
-      ')</span></a>',
-      'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
-    ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
-    alignApp          : 'http://ftlabs-alignment.herokuapp.com/align?text=',
-    notTyposFragments,
-    notTypos,
-    generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`; },
-    phrases : typos,
-    useUncached : true,
-  },
-
-];
 
 const FAILED_SEARCH = '-1'; // to differentiate from actually finding a result of 0
 
@@ -183,7 +132,60 @@ function parseSites( sites ){
   });
 }
 
-function scanRaw() {
+function scanRaw(maxDays=null) {
+  if (maxDays === null) {
+    maxDays = MAXDAYS;
+  }
+  // <div class="search-item">
+  //  <div class="search-item__teaser">
+  //   <div class="o-teaser o-teaser--article o-teaser--small o-teaser--has-image js-teaser" data-id="21281750-87e6-11e9-a028-86cea8523dc2">
+  //    <div class="o-teaser__content">
+  //     <div class="o-teaser__meta">
+  //      <div class="o-teaser__meta-tag">
+  //       <a class="o-teaser__tag" data-trackable="teaser-tag" href="/global-economy">Global Economy</a>
+  //      </div>
+  //     </div>
+  //     <div class="o-teaser__heading">
+  //      <a href="/content/21281750-87e6-11e9-a028-86cea8523dc2" data-trackable="heading-link" class="js-teaser-heading-link">Australia trade surplus misses estimates in April</a>
+  //     </div>
+  //     <p class="o-teaser__standfirst">
+  //      <a href="/content/21281750-87e6-11e9-a028-86cea8523dc2" data-trackable="standfirst-link" tabindex="-1" class="js-teaser-standfirst-link">
+  //       <span>....87bn ($3.4bn), according to the Australian Bureau Statistics published on Thursday. That was down from the $4.95bn surplus recorded in March and below <mark class="search-item__highlight">the</mark> <mark class="search-item__highlight">A</mark>$5.1bn forecast in a Reuters poll.
+  //
+  // Exports...</span>
+  //      </a>
+  //     </p>
+  //     <div class="o-teaser__timestamp">
+  //      <time class="o-teaser__timestamp-date" datetime="2019-06-06T02:17:11+0000">June 6, 2019</time>
+  //     </div>
+
+  const sites = [
+    {
+      name              : 'ft.com',
+      baseQuery         : `https://www.ft.com/search?dateRange=now-${maxDays}d&q=`,
+      maxDays,
+      regExForCount     : 'Viewing results? \\d+‒\\d+ of (\\d+)', // Viewing results 1‒25 of 2578
+      regExForNoResults : 'No results found',
+      regExForEachResult : [
+        'class=\"search-item\"',
+        'class=\"o-teaser__tag\"[^>]+>([^<]+)<', // section
+        'class=\"o-teaser__heading\"',
+        '<a href=\"([^\"]+)\"[^>]+>([^<]+)<', // path, heading
+        'class=\"o-teaser__standfirst\"',
+        '<a.*?<span>(', // standfirst
+        ')</span></a>',
+        'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
+      ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
+      alignApp          : 'http://ftlabs-alignment.herokuapp.com/align?text=',
+      notTyposFragments,
+      notTypos,
+      generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`; },
+      phrases : typos,
+      useUncached : true,
+    },
+
+  ];
+
   return scanForPhrases.raw( sites )
   .then( sitesPlusFormat => {
     const sites = sitesPlusFormat.sites;
@@ -199,6 +201,10 @@ function scanRaw() {
 module.exports = {
   scanRaw,
   config : {
-    sites,
+    MAXDAYS,
+    typos,
+    notTyposFragments,
+    notTypos,
+    standardCandles
   }
 };
