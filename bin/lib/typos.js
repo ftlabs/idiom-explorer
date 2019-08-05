@@ -29,6 +29,7 @@ let notTyposFragments = { // default
   'a a'   : {
     '&amp;<mark'     : 'making M&A a potentially',
     '>A<\\/mark>\\$' : 'and a A$100bn',
+    '>A<\\/mark>[^>]+>a<\\/mark>' : 'Article 35A, a constitutional provision'
   },
   'a the' : {
     '-<mark[^>]+>[aA]<'  : 'as triple-A. The agency',
