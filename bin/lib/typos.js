@@ -39,10 +39,16 @@ let notTyposFragments = { // default
   'an the' : {
     'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group'
   },
+  'said said' : {
+    '>said<\\/mark>[^>]+>Said<\\/mark>' : 'said Said Jahani',
+  },
   'the a' : {
     '>A<\\/mark>'             : 'including the A321XLR launched; to the A level syllabus',
     '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed' // NB the details of the speech marks
   },
+  'were were' : {
+    '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots', 
+  }
 }
 
 if (process.env.hasOwnProperty('NOTTYPOSFRAGMENTS' )) {
