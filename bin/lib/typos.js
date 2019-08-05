@@ -23,25 +23,32 @@ if (process.env.hasOwnProperty('PHRASES' )) {
 //   'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
 // }
 
-// for clarity, break out the regex for a phrase into a list of individual fragments,
-// each of which is a not typo, then concat them with pipes into one regex for each phrase.
+// for clarity, break out the regex for a phrase into a map of individual fragments,
+// each of which is a not typo, with an example, then concat the keys with pipes into one regex for each phrase.
 let notTyposFragments = { // default
-  'a a'   : [
-    '&amp;<mark',
-    '>A<\\/mark>\\$'
-  ],
-  'a the' : [
-    '-<mark[^>]+>[aA]<',
-    '>[aA]<\\/mark>\\)',
-    '&amp;<mark[^>]+>A<'
-  ],
-  'an the' : [
-    'Ping <mark[^>]+>An<'
-  ],
-  'the a' : [
-    '>A<\\/mark>',
-    '“<mark[^>]+>a<\\/mark>”' // NB the details of the speech marks
-  ],
+  'a a'   : {
+    '&amp;<mark'     : 'making M&A a potentially',
+    '>A<\\/mark>\\$' : 'and a A$100bn',
+    '>A<\\/mark>[^>]+>a<\\/mark>' : 'Article 35A, a constitutional provision'
+  },
+  'a the' : {
+    '-<mark[^>]+>[aA]<'  : 'as triple-A. The agency',
+    '>[aA]<\\/mark>\\)'  : 'What is new is a) the declining',
+    '&amp;<mark[^>]+>A<' : 'Banking M&A: the quest',
+  },
+  'an the' : {
+    'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group'
+  },
+  'said said' : {
+    '>said<\\/mark>[^>]+>Said<\\/mark>' : 'said Said Jahani',
+  },
+  'the a' : {
+    '>A<\\/mark>'             : 'including the A321XLR launched; to the A level syllabus',
+    '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed' // NB the details of the speech marks
+  },
+  'were were' : {
+    '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots', 
+  }
 }
 
 if (process.env.hasOwnProperty('NOTTYPOSFRAGMENTS' )) {
@@ -61,7 +68,7 @@ if (process.env.hasOwnProperty('NOTTYPOSFRAGMENTS' )) {
 const notTypos = {};
 Object.keys(notTyposFragments).map( phrase => {
   const fragments = notTyposFragments[phrase];
-  notTypos[phrase] = fragments.join('|');
+  notTypos[phrase] = Object.keys(fragments).join('|');
 });
 
 const standardCandles = [
