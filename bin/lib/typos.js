@@ -47,7 +47,7 @@ let notTyposFragments = { // default
     '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed' // NB the details of the speech marks
   },
   'were were' : {
-    '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots', 
+    '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots',
   }
 }
 
@@ -183,7 +183,7 @@ function scanRaw(maxDays=null) {
         ')</span></a>',
         'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
       ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
-      alignApp          : 'http://ftlabs-alignment.herokuapp.com/align?text=',
+      alignApp          : 'http://ftlabs-suggest.herokuapp.com/articles/alignTitlesInYear/display?term=',
       notTyposFragments,
       notTypos,
       generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`; },
