@@ -29,18 +29,29 @@ let notTyposFragments = { // default
   'a a'   : {
     '&amp;<mark'     : 'making M&A a potentially',
     '>A<\\/mark>\\$' : 'and a A$100bn',
-    '>A<\\/mark>[^>]+>a<\\/mark>' : 'Article 35A, a constitutional provision'
+    '>A<\\/mark>,[^>]+>a<\\/mark>'      : 'Article 35A, a constitutional provision',
+    '>A<\\/mark>-<mark[^>]+>A<\\/mark>' : 'A-A*',
+  },
+  'a an'  : {
+    '\\(<mark[^>]+>[Aa]<\\/mark>\\) <mark[^>]+>an<\\/mark>' : 'including (a) an entity',
+    '>A<\\/mark> +[\—,\-] +<mark[^>]+>an<\\/mark>' : 'Programme A — an early ',
+    '&amp;<mark[^>]+>A<'     : 'at the V&A, an education',
+    '>A<\\/mark>:'         : 'at Costa? A: An Aericano',
   },
   'a the' : {
     '-<mark[^>]+>[aA]<'  : 'as triple-A. The agency',
     '>[aA]<\\/mark>\\)'  : 'What is new is a) the declining',
     '&amp;<mark[^>]+>A<' : 'Banking M&A: the quest',
+    '>A<\\/mark>: '      : 'Exhibit A: the surge',
+    '[’\']<mark[^>]+>a<' : 'seized Sana’a, the capital',
+    'Serie <mark[^>]+>A<': 'of Serie A, the top',
   },
   'an the' : {
     'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group'
   },
   'said said' : {
     '>said<\\/mark>[^>]+>Said<\\/mark>' : 'said Said Jahani',
+    '>Said<\\/mark>,[^>]+>said<\\/mark>' : 'founder of Thunder Said, said this',
   },
   'the a' : {
     '>A<\\/mark>'             : 'including the A321XLR launched; to the A level syllabus',
