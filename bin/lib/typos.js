@@ -122,7 +122,6 @@ function parseSitePhraseObj( site, phraseObj ){
       const heading    = resultMatches[3];
       const standfirst = resultMatches[4];
       const dateText   = resultMatches[5];
-      console.log(`parseSitePhraseObj: resultMatches=${JSON.stringify(resultMatches, null, 2)}`);
       const textMaybeContainingMarks = (standfirst.includes('<mark'))? standfirst : heading;
 
       if (regExForNotTypo !== null
