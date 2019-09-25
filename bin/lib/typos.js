@@ -117,22 +117,27 @@ function parseSitePhraseObj( site, phraseObj ){
     // look up each result
     let resultMatches;
     while ((resultMatches = regExForEachResult.exec(text)) !== null) {
+      const section    = resultMatches[1];
+      const path       = resultMatches[2];
+      const heading    = resultMatches[3];
       const standfirst = resultMatches[4];
+      const dateText   = resultMatches[5];
+      console.log(`parseSitePhraseObj: resultMatches=${JSON.stringify(resultMatches, null, 2)}`);
+      const textMaybeContainingMarks = (standfirst.includes('<mark'))? standfirst : heading;
 
       if (regExForNotTypo !== null
-        && standfirst.match(regExForNotTypo) !== null) {
+        && textMaybeContainingMarks.match(regExForNotTypo) !== null) {
         // skip this result
       } else {
-        const path = resultMatches[2];
         const fullPath = path.startsWith('/') ? `https://www.ft.com${path}` : path;
 
         phraseObj.results.push({
-          section    : resultMatches[1],
+          section,
           path,
           fullPath,
-          heading    : resultMatches[3],
+          heading,
           standfirst,
-          date       : resultMatches[5],
+          date: dateText,
         });
       }
     }
@@ -188,10 +193,10 @@ function scanRaw(maxDays=null) {
         'class=\"search-item\"',
         'class=\"o-teaser__tag\"[^>]+>([^<]+)<', // section
         'class=\"o-teaser__heading\"',
-        '<a href=\"([^\"]+)\"[^>]+>([^<]+)<', // path, heading
+        '<a href=\"([^\"]+)\"[^>]+>(.*?)</a>', // path, heading(may or may not contain a span)
         'class=\"o-teaser__standfirst\"',
-        '<a.*?<span>(', // standfirst
-        ')</span></a>',
+        '<a.*?>(',
+        ')</a>', // standfirst(may or may not contain a span)
         'class=\"o-teaser__timestamp-date\"[^>]+>([^<]+)<', // date
       ].join('(?:.|\\n)*?'), // match any char incl newline. Should be via flag 's' and dotAll '.' for later node versions
       alignApp          : 'http://ftlabs-suggest.herokuapp.com/articles/alignTitlesInYear/display?term=',
