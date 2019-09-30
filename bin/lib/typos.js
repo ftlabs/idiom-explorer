@@ -34,7 +34,7 @@ let notTyposFragments = { // default
   },
   'a an'  : {
     '\\(<mark[^>]+>[Aa]<\\/mark>\\) <mark[^>]+>an<\\/mark>' : 'including (a) an entity',
-    '>A<\\/mark> +[\—,\-] +<mark[^>]+>an<\\/mark>' : 'Programme A — an early ',
+    '>A<\\/mark>\s?[\—,\-] +<mark[^>]+>an<\\/mark>' : 'Programme A — an early ',
     '&amp;<mark[^>]+>A<'     : 'at the V&A, an education',
     '>A<\\/mark>:'         : 'at Costa? A: An Aericano',
   },
@@ -44,7 +44,8 @@ let notTyposFragments = { // default
     '&amp;<mark[^>]+>A<' : 'Banking M&A: the quest',
     '>A<\\/mark>: '      : 'Exhibit A: the surge',
     '[’\']<mark[^>]+>a<' : 'seized Sana’a, the capital',
-    'Serie <mark[^>]+>A<': 'of Serie A, the top',
+    'Series? <mark[^>]+>A<': 'of Serie A, the top',
+    '>a<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'How on a - the scale ',
   },
   'an the' : {
     'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group'
@@ -56,6 +57,9 @@ let notTyposFragments = { // default
   'the a' : {
     '>A<\\/mark>'             : 'including the A321XLR launched; to the A level syllabus',
     '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed' // NB the details of the speech marks
+  },
+  'the the' : {
+    '>the<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'action of the - the actions',
   },
   'were were' : {
     '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots',
