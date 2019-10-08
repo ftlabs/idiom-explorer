@@ -17,12 +17,6 @@ if (process.env.hasOwnProperty('PHRASES' )) {
   console.log( `WARNING: PHRASES not specified in env. Defaulting to ${JSON.stringify(typos)}`);
 }
 
-// const notTypos = {
-//   'a a'   : '(&amp;<mark|>A<\\/mark>\\$)',
-//   'a the' : '(-<mark[^>]+>[aA]<|>[aA]<\\/mark>\\))',
-//   'the a' : '(>A<\\/mark>|“<mark[^>]+>a<\\/mark>”)', // NB the details of the speech marks
-// }
-
 // for clarity, break out the regex for a phrase into a map of individual fragments,
 // each of which is a not typo, with an example, then concat the keys with pipes into one regex for each phrase.
 let notTyposFragments = { // default
@@ -42,7 +36,7 @@ let notTyposFragments = { // default
     '-<mark[^>]+>[aA]<'  : 'as triple-A. The agency',
     '>[aA]<\\/mark>\\)'  : 'What is new is a) the declining',
     '&amp;<mark[^>]+>A<' : 'Banking M&A: the quest',
-    '>A<\\/mark>: '      : 'Exhibit A: the surge',
+    '>A<\\/mark>[:\\.]' : 'Exhibit A: the surge, or Person A. The case continues.',
     '[’\']<mark[^>]+>a<' : 'seized Sana’a, the capital',
     'Series? <mark[^>]+>A<': 'of Serie A, the top',
     '>a<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'How on a - the scale ',
@@ -57,6 +51,9 @@ let notTyposFragments = { // default
   'the a' : {
     '>A<\\/mark>'             : 'including the A321XLR launched; to the A level syllabus',
     '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed' // NB the details of the speech marks
+  },
+  'the an' : {
+    '“<mark[^>]+>An<\\/mark>”' : 'next to the “An” in Grant Thornton’s logo.' // NB the details of the speech marks
   },
   'the the' : {
     '>the<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'action of the - the actions',
