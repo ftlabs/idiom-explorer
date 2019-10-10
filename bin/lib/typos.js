@@ -36,7 +36,7 @@ let notTyposFragments = { // default
     '-<mark[^>]+>[aA]<'  : 'as triple-A. The agency',
     '>[aA]<\\/mark>\\)'  : 'What is new is a) the declining',
     '&amp;<mark[^>]+>A<' : 'Banking M&A: the quest',
-    '>A<\\/mark>[:\\.]' : 'Exhibit A: the surge, or Person A. The case continues.',
+    '>A<\\/mark>[:\\.,]' : 'Exhibit A: the surge, or Person A. The case continues. Person A, the',
     '[’\']<mark[^>]+>a<' : 'seized Sana’a, the capital',
     'Series? <mark[^>]+>A<': 'of Serie A, the top',
     '>a<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'How on a - the scale ',
