@@ -40,9 +40,13 @@ let notTyposFragments = { // default
     '[’\']<mark[^>]+>a<' : 'seized Sana’a, the capital',
     'Series? <mark[^>]+>A<': 'of Serie A, the top',
     '>a<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'How on a - the scale ',
+    'a\\.k\\.<mark[^>]+>a<\\/mark>' : 'a.k.a. the original',
   },
   'an the' : {
     'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group'
+  },
+  'pubic' : {
+    '<mark[^>]+>[Pp]ubic<\\/mark> (?:area|bone|hair|fuzz|triangle)' : 'pubic hair, etc',
   },
   'said said' : {
     '>said<\\/mark>[^>]+>Said<\\/mark>' : 'said Said Jahani',
@@ -60,6 +64,9 @@ let notTyposFragments = { // default
   },
   'were were' : {
     '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots',
+  },
+  'with with' : {
+    '<mark[^>]+>with<\\/mark>\\. <mark[^>]+>With<\\/mark>' : 'work with. With more',
   }
 }
 
