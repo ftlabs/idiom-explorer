@@ -43,7 +43,8 @@ let notTyposFragments = { // default
     'a\\.k\\.<mark[^>]+>a<\\/mark>' : 'a.k.a. the original',
   },
   'an the' : {
-    'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group'
+    'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group',
+    '<mark[^>]+>An<\\/mark>\.' : 'were from Nghe An. The two'
   },
   'pubic' : {
     '<mark[^>]+>[Pp]ubic<\\/mark> (?:area|bone|hair|fuzz|triangle)' : 'pubic hair, etc',
@@ -138,12 +139,19 @@ function parseSitePhraseObj( site, phraseObj ){
       } else {
         const fullPath = path.startsWith('/') ? `https://www.ft.com${path}` : path;
 
+        let standFirstParts;
+        let standfirstCropped = "standfirst";
+        if ((standFirstParts = /(.*\W)(\w+\W*<mark.+<\/mark>.+<\/mark>\W*\w+)(.*)/.exec( standfirst)) !== null) {
+          standfirstCropped = `... ${standFirstParts[2]} ...`;
+        }
+
         phraseObj.results.push({
           section,
           path,
           fullPath,
           heading,
           standfirst,
+          standfirstCropped,
           date: dateText,
         });
       }
