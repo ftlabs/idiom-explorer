@@ -8,9 +8,13 @@
     </p>
     <ul>
       {{#each phraseObj.results as |result|}}
-        <li>({{result.section}}, {{result.date}}) {{result.heading}} (<a href="{{result.fullPath}}">{{result.fullPath}}</a>)</li>
-        <p>{{{result.standfirst}}}</p>
-        <p>--&gt; "{{phrase}}"</p>
+        <li>
+          <p>({{result.section}}, {{result.date}})</p>
+          <p>{{result.heading}}</p>
+          <p><a href="{{result.fullPath}}">{{result.fullPath}}</a></p>
+          <p>{{{result.standfirst}}}</p>
+          <p>--&gt; "{{phrase}}"</p>
+        </li>
       {{/each}}
     </ul>
   {{/each}}
