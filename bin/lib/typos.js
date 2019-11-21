@@ -140,7 +140,7 @@ function parseSitePhraseObj( site, phraseObj ){
         const fullPath = path.startsWith('/') ? `https://www.ft.com${path}` : path;
 
         let standFirstParts;
-        let standfirstCropped = "standfirst";
+        let standfirstCropped = standfirst;
         if ((standFirstParts = /(.*\W)(\w+\W*<mark.+<\/mark>.+<\/mark>\W*\w+)(.*)/.exec( standfirst)) !== null) {
           standfirstCropped = `... ${standFirstParts[2]} ...`;
         }
