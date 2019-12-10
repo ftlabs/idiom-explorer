@@ -40,7 +40,7 @@ let notTyposFragments = { // default
     '[’\']<mark[^>]+>a<' : 'seized Sana’a, the capital',
     'Series? <mark[^>]+>A<': 'of Serie A, the top',
     '>a<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'How on a - the scale ',
-    'a\\.k\\.<mark[^>]+>a<\\/mark>' : 'a.k.a. the original',
+    'k\\.<mark[^>]+>a<\\/mark>' : 'a.k.a. the original',
   },
   'an the' : {
     'Ping <mark[^>]+>An<' : 'like Ping An, the insurance group',
@@ -55,13 +55,15 @@ let notTyposFragments = { // default
   },
   'the a' : {
     '>A<\\/mark>'             : 'including the A321XLR launched; to the A level syllabus',
-    '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed' // NB the details of the speech marks
+    '“<mark[^>]+>a<\\/mark>”' : 'Hera was the “a” removed', // NB the details of the speech marks
+    '<mark[^>]+>a<\\/mark>\\d+' : 'queen the a4'
   },
   'the an' : {
     '“<mark[^>]+>An<\\/mark>”' : 'next to the “An” in Grant Thornton’s logo.' // NB the details of the speech marks
   },
   'the the' : {
     '>the<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'action of the - the actions',
+    '>[tT]he<\\/mark>\\.{3} ?<mark[^>]+>the<\\/mark>' : 'The... the... you... it did it',
   },
   'were were' : {
     '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots',
