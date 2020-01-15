@@ -114,6 +114,7 @@ if (process.env.hasOwnProperty('MAXDAYS' )) {
 const FAILED_SEARCH = '-1'; // to differentiate from actually finding a result of 0
 
 function parseSitePhraseObj( site, phraseObj ){
+  console.log( `parseSitePhraseObj: site.ignores=${JSON.stringify(site.ignores, null, 2)}` );
   const phrase = phraseObj.phrase;
   const query = phraseObj.query;
   const regExForCount      = new RegExp( site.regExForCount      );
@@ -134,6 +135,14 @@ function parseSitePhraseObj( site, phraseObj ){
       const standfirst = resultMatches[4];
       const dateText   = resultMatches[5];
       const textMaybeContainingMarks = (standfirst.includes('<mark'))? standfirst : heading;
+
+      const allText = section + path + heading + standfirst;
+      anyShouldIgnores = site.ignores.filter( ignore => {
+        const regex = new RegExp(ignore,"i");
+        return ignore !== "" && allText.match(regex) !== null;
+      });
+
+      if (anyShouldIgnores.length > 0) { continue; }
 
       if (regExForNotTypo !== null
         && textMaybeContainingMarks.match(regExForNotTypo) !== null) {
@@ -172,32 +181,10 @@ function parseSites( sites ){
   });
 }
 
-function scanRaw(maxDays=null) {
+function scanRaw(maxDays=null,ignoreCsv=null) {
   if (maxDays === null) {
     maxDays = MAXDAYS;
   }
-  // <div class="search-item">
-  //  <div class="search-item__teaser">
-  //   <div class="o-teaser o-teaser--article o-teaser--small o-teaser--has-image js-teaser" data-id="21281750-87e6-11e9-a028-86cea8523dc2">
-  //    <div class="o-teaser__content">
-  //     <div class="o-teaser__meta">
-  //      <div class="o-teaser__meta-tag">
-  //       <a class="o-teaser__tag" data-trackable="teaser-tag" href="/global-economy">Global Economy</a>
-  //      </div>
-  //     </div>
-  //     <div class="o-teaser__heading">
-  //      <a href="/content/21281750-87e6-11e9-a028-86cea8523dc2" data-trackable="heading-link" class="js-teaser-heading-link">Australia trade surplus misses estimates in April</a>
-  //     </div>
-  //     <p class="o-teaser__standfirst">
-  //      <a href="/content/21281750-87e6-11e9-a028-86cea8523dc2" data-trackable="standfirst-link" tabindex="-1" class="js-teaser-standfirst-link">
-  //       <span>....87bn ($3.4bn), according to the Australian Bureau Statistics published on Thursday. That was down from the $4.95bn surplus recorded in March and below <mark class="search-item__highlight">the</mark> <mark class="search-item__highlight">A</mark>$5.1bn forecast in a Reuters poll.
-  //
-  // Exports...</span>
-  //      </a>
-  //     </p>
-  //     <div class="o-teaser__timestamp">
-  //      <time class="o-teaser__timestamp-date" datetime="2019-06-06T02:17:11+0000">June 6, 2019</time>
-  //     </div>
 
   const sites = [
     {
@@ -222,6 +209,7 @@ function scanRaw(maxDays=null) {
       generateSiteQuery : ( site, phrase ) => { return `${site.baseQuery}"${phrase}"`; },
       phrases : typos,
       useUncached : true,
+      ignores : ((ignoreCsv == null)? 'ftalphaville' : ignoreCsv).split(','),
     },
 
   ];

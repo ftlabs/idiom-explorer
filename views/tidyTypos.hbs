@@ -1,5 +1,11 @@
 <h1>Typos for assorted sites</h1>
-
+<p>
+  Additional params:
+  <ul>
+    <li>?maxDays=7</li>
+    <li>?ignore=fridge,bicycle (default is ftalphaville, can be overridden by ?ignore=)</li>
+  </ul>
+</p>
 {{#each sites as |site|}}
   <h2>{{ site.name }}, over past {{site.maxDays}} days</h2>
   {{#each site.byPhrase as |phraseObj phrase|}}

@@ -59,8 +59,9 @@ app.use("/typos/config", (req, res) => {
 
 app.use("/typos/tidy", (req, res) => {
   const maxDays = req.query.hasOwnProperty('maxdays')? parseInt(req.query.maxdays) : null;
-  
-  typos.scanRaw(maxDays)
+  const ignoreCsv = req.query.hasOwnProperty('ignore')? req.query.ignore : null;
+
+  typos.scanRaw(maxDays, ignoreCsv)
   .then( sites => {
     res.render('tidyTypos', { sites });
   })
