@@ -69,7 +69,7 @@ let notTyposFragments = { // default
     '“<mark[^>]+>Were<\\/mark>[^>]+>Were<\\/mark>”' : 'He ended with “Were Were”, drums firing like gunshots',
   },
   'with with' : {
-    '<mark[^>]+>with<\\/mark>\\. <mark[^>]+>With<\\/mark>' : 'work with. With more',
+    '<mark[^>]+>with<\\/mark>\\.\\s*<mark[^>]+>With<\\/mark>' : 'work with. With more',
   }
 }
 
