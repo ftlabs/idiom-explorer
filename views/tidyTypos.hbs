@@ -10,12 +10,15 @@
   <h2>{{ site.name }}, over past {{site.maxDays}} days</h2>
   {{#each site.byPhrase as |phraseObj phrase|}}
     <p>
-      <a href="{{ phraseObj.query}}">{{ phrase }}</a> (status {{phraseObj.status}}, results {{phraseObj.result}}{{#if site.alignApp}}, <a href="{{site.alignApp}}{{phrase}}">align</a>{{/if}})
+      <a href="{{ phraseObj.query}}">{{ phrase }}</a>
+      (status {{phraseObj.status}},
+      results {{phraseObj.result}}{{#if site.alignApp}},
+      <a href="{{site.alignApp}}{{phrase}}">align</a>{{/if}})
     </p>
     <ul>
       {{#each phraseObj.results as |result|}}
         <li>
-          <p>({{result.section}}, {{result.date}})</p>
+          <p>({{result.section}}, {{result.date}}, <a href="mailto:{{result.mailto}}">mailto</a>)</p>
           <p>{{result.heading}}</p>
           <p><a href="{{result.fullPath}}">{{result.fullPath}}</a></p>
           <p>{{{result.standfirstCropped}}}</p>
