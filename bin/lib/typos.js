@@ -17,6 +17,16 @@ if (process.env.hasOwnProperty('PHRASES' )) {
   console.log( `WARNING: PHRASES not specified in env. Defaulting to ${JSON.stringify(typos)}`);
 }
 
+let typo_mailing_list;
+if (process.env.hasOwnProperty('TYPO_MAILING_LIST' )) {
+  typo_mailing_list = process.env.TYPO_MAILING_LIST;
+} else{
+  console.log( `WARNING: TYPO_MAILING_LIST not specified. Defaulting to ***@ft.com`);
+  typo_mailing_list = '***@ft.com';
+}
+
+const TYPO_MAILING_LIST = typo_mailing_list;
+
 // for clarity, break out the regex for a phrase into a map of individual fragments,
 // each of which is a not typo, with an example, then concat the keys with pipes into one regex for each phrase.
 let notTyposFragments = { // default
@@ -156,6 +166,20 @@ function parseSitePhraseObj( site, phraseObj ){
           standfirstCropped = `... ${standFirstParts[2]} ...`;
         }
 
+        const standfirstCroppedNoHtml = standfirstCropped.replace(/<[^>]+>/g, '');
+
+        const mailtoParts = {
+          email: TYPO_MAILING_LIST,
+          subject: `'${phrase}' typo in ${heading}`,
+          body: [
+            `(${section}, ${dateText})`,
+            heading,
+            fullPath,
+            standfirstCroppedNoHtml,
+            `--> '${phrase}'`
+          ].join('%0D%0A%0D%0A'),
+        };
+
         phraseObj.results.push({
           section,
           path,
@@ -164,6 +188,7 @@ function parseSitePhraseObj( site, phraseObj ){
           standfirst,
           standfirstCropped,
           date: dateText,
+          mailto: `${mailtoParts.email}?subject=${mailtoParts.subject}&body=${mailtoParts.body}`,
         });
       }
     }
