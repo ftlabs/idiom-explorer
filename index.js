@@ -6,7 +6,6 @@ const debug = require("debug")(`${package.name}:index`);
 const express = require("express");
 const path = require("path");
 const app = express();
-const validateRequest = require("./helpers/check-token");
 
 const typos = require("./bin/lib/typos");
 const scanForPhrases = require("./bin/lib/scanForPhrases");
@@ -21,6 +20,22 @@ let requestLogger = function(req, res, next) {
   next(); // Passing the request to the next handler in the stack.
 };
 
+const session = require('cookie-session');
+const OktaMiddleware = require('@financial-times/okta-express-middleware');
+const okta = new OktaMiddleware({
+  client_id: process.env.OKTA_CLIENT,
+  client_secret: process.env.OKTA_SECRET,
+  issuer: process.env.OKTA_ISSUER,
+  appBaseUrl: process.env.BASE_URL,
+  scope: 'openid offline_access name'
+});
+
+app.use(session({
+	secret: process.env.SESSION_TOKEN,
+	maxAge: 24 * 3600 * 1000, //24h
+	httpOnly: true
+}));
+
 app.use(requestLogger);
 
 // these routes do *not* have s3o
@@ -33,9 +48,61 @@ if (!TOKEN) {
 
 // these route *do* use s3o
 app.set("json spaces", 2);
-if (process.env.BYPASS_TOKEN !== "true") {
-  app.use(validateRequest);
-}
+
+
+// Check for valid OKTA login or valid token to byass OKTA login
+// This function is not in a middleware or seperate file because
+// it requires the context of okta and app.use to function
+app.use((req, res, next) => {
+  if ('token' in req.headers){
+	   if(req.headers.token === process.env.TOKEN){
+		     debug(`Token (header) was valid.`);
+		     next();
+       } else {
+         debug(`The token (header) value passed was invalid.`);
+         res.status(401);
+         res.json({
+           status : 'err',
+           message : 'The token (header) value passed was invalid.'
+         });
+       }
+  } else if('token' in req.query ){
+    if(req.query.token === process.env.TOKEN){
+      debug(`Token (query string) was valid.`);
+		  next();
+    } else {
+      debug(`The token (query) value passed was invalid.`);
+      res.status(401);
+      res.json({
+        status : 'err',
+        message : 'The token (query) value passed was invalid.'
+      });
+    }
+  } else {
+    debug(`No token in header or query, so defaulting to OKTA`);
+		// here to replicate multiple app.uses we have to do
+		// some gross callback stuff. You might be able to
+    // find a nicer way to do this
+
+		// This is the equivalent of calling this:
+		// app.use(okta.router);
+		// app.use(okta.ensureAuthenticated());
+    // app.use(okta.verifyJwts());
+
+		okta.router(req, res, error => {
+			if (error) {
+				return next(error);
+      }
+			okta.ensureAuthenticated()(req, res, error => {
+				if (error) {
+					return next(error);
+        }
+				okta.verifyJwts()(req, res, next);
+      });
+    });
+  }
+});
+
 
 //Core Routes
 
