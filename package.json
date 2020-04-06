@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/ftlabs/...#readme",
   "dependencies": {
-    "@financial-times/s3o-middleware": "^2.0.4",
+    "@financial-times/okta-express-middleware": "0.0.4",
+    "cookie-session": "^1.4.0",
     "debug": "^2.3.3",
     "dotenv": "^2.0.0",
     "express": "^4.16.4",
@@ -30,6 +31,7 @@
     "node-fetch": "^1.6.3"
   },
   "engines": {
-    "node": "8.9.x"
+    "node": "10.19.0",
+    "npm": ">=6.0.0"
   }
 }
