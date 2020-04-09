@@ -1,6 +1,29 @@
 # idiom-explorer
 whimsical investigation into use of idioms in news articles
 
+
+## Setup
+
+- Run `npm install`
+
+### .env 
+
+- Run `touch .env` to create the required **.env** file
+- Open your new **.env** file and add the following variables:
+
+PORT=3006
+BASE_URL=http://localhost:3006
+OKTA_CLIENT=
+OKTA_ISSUER=
+OKTA_SECRET=
+SESSION_TOKEN=
+
+#### Where to find OKTA .env vars
+
+- Get `SESSION_TOKEN` from LastPass
+- Get details for finding `OKTA_ISSUER`, `OKTA_CLIENT` & `OKTA_SECRET` in LastPass
+
+
 ## version 1
 
 > node scanForIdioms.js
