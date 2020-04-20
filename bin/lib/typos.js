@@ -70,7 +70,8 @@ let notTyposFragments = { // default
     '<mark[^>]+>a<\\/mark>\\d+' : 'queen the a4'
   },
   'the an' : {
-    '“<mark[^>]+>An<\\/mark>”' : 'next to the “An” in Grant Thornton’s logo.' // NB the details of the speech marks
+    '“<mark[^>]+>An<\\/mark>”' : 'next to the “An” in Grant Thornton’s logo.', // NB the details of the speech marks
+    '<mark[^>]+>AN<\\/mark>-' : 'thanked the AN-124’s pilot.',
   },
   'the the' : {
     '>the<\\/mark> +[\—\-] +<mark[^>]+>the<\\/mark>' : 'action of the - the actions',
@@ -82,6 +83,7 @@ let notTyposFragments = { // default
   },
   'with with' : {
     '<mark[^>]+>with<\\/mark>\\.\\s*<mark[^>]+>With<\\/mark>' : 'work with. With more',
+    '<mark[^>]+>with<\\/mark>,\\s*<mark[^>]+>with<\\/mark>' : 'be dealt with, with all ',
   }
 }
 
