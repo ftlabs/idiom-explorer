@@ -35,6 +35,7 @@ let notTyposFragments = { // default
     '>A<\\/mark>\\$' : 'and a A$100bn',
     '>A<\\/mark>,[^>]+>a<\\/mark>'      : 'Article 35A, a constitutional provision',
     '>A<\\/mark>-<mark[^>]+>A<\\/mark>' : 'A-A*',
+    '<mark[^>]+>à</mark>' : 'On a à côté de',
   },
   'a an'  : {
     '\\(<mark[^>]+>[Aa]<\\/mark>\\) <mark[^>]+>an<\\/mark>' : 'including (a) an entity',
